@@ -1,0 +1,52 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Production — Joe Psybin">
+  <h1>Production</h1>
+  <p class="lead">
+    Joe also produces records for a small number of artists each year.
+    Nashville-based, remote-friendly, analog-leaning.
+  </p>
+
+  <section>
+    <h2>What I do</h2>
+    <ul>
+      <li>Full-production for singles and EPs (tracking, arrangement, mix, master prep)</li>
+      <li>Mixing — from stems, from scratch, or cleanup</li>
+      <li>Songwriting collaboration and pre-production</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Rates &amp; availability</h2>
+    <p class="muted">
+      Project-based. Reach out with what you&rsquo;re working on and I&rsquo;ll get back with a quote and timeline.
+    </p>
+    <p>
+      <a class="btn" href="/contact">Get in touch</a>
+    </p>
+  </section>
+
+  <style>
+    .lead {
+      font-size: 1.15rem;
+      color: var(--fg);
+      max-width: 42rem;
+    }
+    ul { padding-left: 1.25rem; }
+    ul li { margin: 0.35rem 0; }
+    .btn {
+      display: inline-block;
+      padding: 0.6rem 1.5rem;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.9rem;
+      font-family: ui-sans-serif, system-ui, sans-serif;
+    }
+    .btn:hover { background: var(--accent); color: var(--bg); text-decoration: none; }
+  </style>
+</BaseLayout>

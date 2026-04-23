@@ -1,0 +1,100 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Contact — Vibin' Psybin and the Sunlight Band">
+  <h1>Contact</h1>
+  <p>Booking, press, collaborations, hellos.</p>
+
+  <form id="contact-form" action="/api/contact" method="POST" class="form">
+    <label>
+      Your name
+      <input name="name" type="text" required autocomplete="name" />
+    </label>
+    <label>
+      Your email
+      <input name="email" type="email" required autocomplete="email" />
+    </label>
+    <label>
+      What's up?
+      <textarea name="message" rows="6" required></textarea>
+    </label>
+    <button type="submit">Send</button>
+    <p class="form-msg" id="form-msg" aria-live="polite"></p>
+  </form>
+
+  <style>
+    .form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      max-width: 36rem;
+      margin: 2rem 0;
+    }
+    .form label {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      color: var(--fg-muted);
+      font-family: ui-sans-serif, system-ui, sans-serif;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .form input, .form textarea {
+      padding: 0.75rem 1rem;
+      background: var(--bg-alt);
+      border: 1px solid var(--line);
+      color: var(--fg);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 1rem;
+    }
+    .form input:focus, .form textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .form button {
+      padding: 0.75rem 1.5rem;
+      background: var(--accent);
+      border: none;
+      color: var(--bg);
+      border-radius: 4px;
+      font-family: ui-sans-serif, system-ui, sans-serif;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      align-self: flex-start;
+    }
+    .form button:hover { background: var(--accent-dim); }
+    .form-msg { min-height: 1.2em; font-size: 0.9rem; }
+  </style>
+
+  <script>
+    const form = document.getElementById("contact-form") as HTMLFormElement | null;
+    const msg = document.getElementById("form-msg");
+    if (form && msg) {
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const fd = new FormData(form);
+        msg.textContent = "Sending...";
+        try {
+          const res = await fetch(form.action, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(Object.fromEntries(fd)),
+          });
+          if (res.ok) {
+            msg.textContent = "Thanks — message sent.";
+            form.reset();
+          } else {
+            msg.textContent = "Something went wrong. Try again?";
+          }
+        } catch {
+          msg.textContent = "Network error. Try again?";
+        }
+      });
+    }
+  </script>
+</BaseLayout>

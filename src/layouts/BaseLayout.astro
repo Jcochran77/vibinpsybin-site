@@ -1,0 +1,169 @@
+---
+export interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "Vibin' Psybin and the Sunlight Band",
+  description = "Nashville-based psychedelic cosmic country. Direct from the band to you — no social media required.",
+} = Astro.props;
+
+const nav = [
+  { href: "/", label: "Home" },
+  { href: "/music", label: "Music" },
+  { href: "/videos", label: "Videos" },
+  { href: "/shows", label: "Shows" },
+  { href: "/contact", label: "Contact" },
+  { href: "/producer", label: "Production" },
+];
+
+const path = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+  </head>
+  <body>
+    <header>
+      <div class="brand">
+        <a href="/" class="logo">Vibin&rsquo; Psybin<span>&nbsp;&amp; the Sunlight Band</span></a>
+      </div>
+      <nav>
+        {
+          nav.map((item) => (
+            <a
+              href={item.href}
+              class:list={[{ active: path === item.href || (item.href !== "/" && path.startsWith(item.href)) }]}
+            >
+              {item.label}
+            </a>
+          ))
+        }
+      </nav>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer>
+      <p>&copy; {new Date().getFullYear()} Vibin&rsquo; Psybin and the Sunlight Band. Nashville, TN.</p>
+      <p class="fine-print">
+        No tracking. No ads. No algorithm. Just the music.
+      </p>
+    </footer>
+
+    <style is:global>
+      :root {
+        --bg: #0d0a14;
+        --bg-alt: #17121f;
+        --fg: #f5efe4;
+        --fg-muted: #a89d8a;
+        --accent: #e8a33d;
+        --accent-dim: #b07a24;
+        --line: #2a2233;
+      }
+
+      * { box-sizing: border-box; }
+
+      html, body {
+        margin: 0;
+        padding: 0;
+        background: var(--bg);
+        color: var(--fg);
+        font-family: ui-serif, Georgia, "Times New Roman", serif;
+        line-height: 1.6;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+
+      a { color: var(--accent); text-decoration: none; }
+      a:hover { text-decoration: underline; }
+
+      header {
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .brand .logo {
+        font-size: 1.6rem;
+        font-weight: 600;
+        color: var(--fg);
+        letter-spacing: 0.02em;
+      }
+      .brand .logo span {
+        color: var(--fg-muted);
+        font-weight: 400;
+        font-style: italic;
+      }
+
+      nav {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+      }
+      nav a {
+        color: var(--fg-muted);
+        font-family: ui-sans-serif, system-ui, sans-serif;
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      nav a.active { color: var(--accent); }
+      nav a:hover { color: var(--fg); text-decoration: none; }
+
+      main {
+        flex: 1;
+        padding: 2rem;
+        max-width: 1100px;
+        width: 100%;
+        margin: 0 auto;
+      }
+
+      h1, h2, h3 {
+        font-family: ui-serif, Georgia, serif;
+        color: var(--fg);
+        line-height: 1.2;
+      }
+      h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+      h2 { font-size: 1.8rem; margin-top: 2.5rem; }
+
+      .muted { color: var(--fg-muted); }
+
+      footer {
+        padding: 2rem;
+        border-top: 1px solid var(--line);
+        text-align: center;
+        color: var(--fg-muted);
+        font-family: ui-sans-serif, system-ui, sans-serif;
+        font-size: 0.85rem;
+      }
+      .fine-print { font-style: italic; opacity: 0.7; margin-top: 0.5rem; }
+
+      @media (min-width: 720px) {
+        header {
+          flex-direction: row;
+          justify-content: space-between;
+          align-items: center;
+        }
+      }
+    </style>
+  </body>
+</html>

@@ -1,0 +1,57 @@
+[
+  {
+    "id": "hippie-cowboy",
+    "title": "Hippie Cowboy",
+    "artist": "Vibin' Psybin and the Sunlight Band",
+    "year": 2024,
+    "type": "album",
+    "tracks": [
+      "Do No Wrong",
+      "Good Time Girls",
+      "King of Tennessee",
+      "I Know A Girl",
+      "Because You Said So"
+    ],
+    "bandcampEmbed": null,
+    "appleMusicUrl": "https://music.apple.com/us/artist/vibin-psybin-and-the-sunlight-band/1696194619",
+    "notes": "Full-length band record. Cosmic country meets psych."
+  },
+  {
+    "id": "live-fast-ep",
+    "title": "Live Fast",
+    "artist": "Psybin",
+    "year": 2023,
+    "type": "ep",
+    "bandcampEmbed": null,
+    "notes": "Solo EP."
+  },
+  {
+    "id": "live-fast-headlights",
+    "title": "Live Fast / Headlights",
+    "artist": "Psybin",
+    "year": 2023,
+    "type": "single"
+  },
+  {
+    "id": "a-million-miles-love-song-2",
+    "title": "A Million Miles / Love Song #2",
+    "artist": "Psybin",
+    "year": 2022,
+    "type": "single"
+  },
+  {
+    "id": "token",
+    "title": "Token",
+    "artist": "Psybin",
+    "year": 2021,
+    "type": "single"
+  },
+  {
+    "id": "deja-vu",
+    "title": "Deja Vu",
+    "artist": "Psybin",
+    "year": 2020,
+    "type": "single",
+    "notes": "Solo debut."
+  }
+]

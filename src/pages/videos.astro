@@ -1,0 +1,67 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import videos from "../data/videos.json";
+
+const realVideos = videos.filter((v) => v.youtubeId);
+---
+
+<BaseLayout title="Videos — Vibin' Psybin and the Sunlight Band">
+  <h1>Videos</h1>
+  <p class="muted">Music videos and visuals. Uploaded to YouTube, embedded here.</p>
+
+  {realVideos.length === 0 ? (
+    <p class="coming-soon">Music videos are being uploaded. Check back soon.</p>
+  ) : (
+    <div class="grid">
+      {realVideos.map((v) => (
+        <div class="video">
+          <div class="frame">
+            <iframe
+              src={`https://www.youtube-nocookie.com/embed/${v.youtubeId}`}
+              title={v.title}
+              frameborder="0"
+              allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+            ></iframe>
+          </div>
+          <p class="title">{v.title}</p>
+        </div>
+      ))}
+    </div>
+  )}
+
+  <style>
+    .coming-soon {
+      padding: 3rem;
+      text-align: center;
+      border: 1px dashed var(--line);
+      border-radius: 6px;
+      color: var(--fg-muted);
+      font-style: italic;
+      margin-top: 2rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    @media (min-width: 720px) {
+      .grid { grid-template-columns: 1fr 1fr; }
+    }
+    .frame {
+      position: relative;
+      padding-bottom: 56.25%;
+      background: #000;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .frame iframe {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      border: 0;
+    }
+    .video .title { margin-top: 0.5rem; color: var(--fg); }
+  </style>
+</BaseLayout>
