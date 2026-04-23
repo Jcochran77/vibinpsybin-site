@@ -1,12 +1,9 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import shows from "../data/shows.json";
+import { fetchShows } from "../lib/bandsintown";
 import releases from "../data/releases.json";
 
-const now = new Date();
-const upcomingShows = shows
-  .filter((s) => new Date(s.date) >= now)
-  .sort((a, b) => +new Date(a.date) - +new Date(b.date));
+const upcomingShows = await fetchShows("upcoming");
 const nextShow = upcomingShows[0];
 const latestRelease = releases[0];
 
@@ -32,9 +29,8 @@ function formatDate(iso: string) {
   {nextShow && (
     <section class="card">
       <h2>Next show</h2>
-      <p class="big">{formatDate(nextShow.date)}</p>
+      <p class="big">{formatDate(nextShow.datetime)}</p>
       <p><strong>{nextShow.venue}</strong> &middot; {nextShow.city}</p>
-      {nextShow.notes && <p class="muted">{nextShow.notes}</p>}
       {nextShow.ticketUrl ? (
         <p><a class="btn" href={nextShow.ticketUrl}>Get tickets</a></p>
       ) : (
