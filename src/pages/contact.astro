@@ -2,15 +2,24 @@
 import { Image } from "astro:assets";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import outdoorPhoto from "../assets/photos/outdoor-purple.jpg";
+
+// Optional pre-fill from query string (?re=Song+Name) — used by Music page
+// per-song "Drop Joe a line about this song →" links.
+const re = Astro.url.searchParams.get("re");
+const initialMessage = re ? `Re: ${re}\n\n` : "";
+const initialKind = re ? "song-feedback" : "hello";
 ---
 
-<BaseLayout title="Contact — Vibin' Psybin and the Sunlight Band">
+<BaseLayout
+  title="Say hey — Vibin' Psybin and the Sunlight Band"
+  description="Drop us a line. We read every one. Sometimes we even write back."
+>
   <section class="band page-hero">
     <div class="wrap-narrow">
-      <p class="eyebrow">Say hi</p>
-      <h1>Contact</h1>
-      <p class="lead muted">
-        Booking, press, collaborations, hellos. Drop a line.
+      <p class="eyebrow">Say hey 👋</p>
+      <h1>Drop us a line.</h1>
+      <p class="lead">
+        We read every one. Sometimes we even write back.
       </p>
     </div>
   </section>
@@ -25,23 +34,51 @@ import outdoorPhoto from "../assets/photos/outdoor-purple.jpg";
           sizes="(max-width: 760px) 90vw, 400px"
           class="photo"
         />
+        <p class="photo-caption">
+          🎸 Joe, somewhere outside Nashville
+        </p>
       </div>
+
       <form id="contact-form" action="/api/contact" method="POST" class="form">
-        <label>
-          <span class="label-text">Your name</span>
-          <input name="name" type="text" required autocomplete="name" />
+        <label class="field">
+          <span class="label-text">What kind of message is this?</span>
+          <select name="kind" id="kind">
+            <option value="hello" selected={initialKind === "hello"}>Just saying hi 👋</option>
+            <option value="song-feedback" selected={initialKind === "song-feedback"}>Thoughts on a song 🎵</option>
+            <option value="booking">Show booking 🎤</option>
+            <option value="production">Production work 🎛️</option>
+            <option value="press">Press / interviews 📰</option>
+            <option value="other">Something else 🎨</option>
+          </select>
         </label>
-        <label>
-          <span class="label-text">Your email</span>
-          <input name="email" type="email" required autocomplete="email" />
+
+        <label class="field">
+          <span class="label-text">Who&rsquo;s this?</span>
+          <input name="name" type="text" required autocomplete="name" placeholder="Your name" />
         </label>
-        <label>
-          <span class="label-text">What's up?</span>
-          <textarea name="message" rows="6" required></textarea>
+
+        <label class="field">
+          <span class="label-text">Where can we find you?</span>
+          <input name="email" type="email" required autocomplete="email" placeholder="your@email.com" />
         </label>
-        <button type="submit" class="btn btn-solid">Send message</button>
+
+        <label class="field">
+          <span class="label-text">What&rsquo;s on your mind?</span>
+          <textarea name="message" rows="7" required placeholder="..." set:html={initialMessage}></textarea>
+        </label>
+
+        <button type="submit" class="btn btn-solid">Send it</button>
         <p class="form-msg" id="form-msg" aria-live="polite"></p>
       </form>
+    </div>
+  </section>
+
+  <section class="band signoff">
+    <div class="wrap-narrow center">
+      <p class="mantra">
+        No bots. No auto-replies.
+        <br/><em>Just a guy reading a message.</em>
+      </p>
     </div>
   </section>
 
@@ -51,16 +88,21 @@ import outdoorPhoto from "../assets/photos/outdoor-purple.jpg";
       text-align: center;
     }
     .lead {
-      font-size: 1.1rem;
-      max-width: 42rem;
+      font-size: 1.2rem;
+      color: var(--fg-muted);
+      font-style: italic;
+      max-width: 36rem;
       margin: 0.5rem auto 0;
     }
 
     .contact-grid {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 3rem;
+      gap: 2.5rem;
       align-items: start;
+    }
+    .contact-photo {
+      text-align: center;
     }
     .contact-photo .photo {
       width: 100%;
@@ -68,10 +110,21 @@ import outdoorPhoto from "../assets/photos/outdoor-purple.jpg";
       border-radius: 3px;
       box-shadow: 0 20px 40px rgba(0,0,0,0.4);
     }
+    .photo-caption {
+      margin: 0.75rem 0 0;
+      font-size: 0.9rem;
+      color: var(--fg-muted);
+      font-style: italic;
+    }
+
     .form {
       display: flex;
       flex-direction: column;
-      gap: 1.25rem;
+      gap: 1.5rem;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
     }
     .label-text {
       color: var(--fg-muted);
@@ -80,12 +133,13 @@ import outdoorPhoto from "../assets/photos/outdoor-purple.jpg";
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.18em;
-      margin-bottom: 0.35rem;
-      display: block;
+      margin-bottom: 0.5rem;
     }
-    .form input, .form textarea {
+    .form input,
+    .form textarea,
+    .form select {
       width: 100%;
-      padding: 0.85rem 1rem;
+      padding: 0.95rem 1rem;
       background: var(--bg-alt);
       border: 1px solid var(--line);
       color: var(--fg);
@@ -94,25 +148,56 @@ import outdoorPhoto from "../assets/photos/outdoor-purple.jpg";
       font-size: 1rem;
       transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
+    .form select {
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' fill='none' stroke='%23b9abc6' stroke-width='2'/></svg>");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      padding-right: 2.5rem;
+      cursor: pointer;
+    }
     .form textarea {
       resize: vertical;
-      min-height: 8rem;
+      min-height: 9rem;
+      line-height: 1.55;
     }
-    .form input:focus, .form textarea:focus {
+    .form input:focus,
+    .form textarea:focus,
+    .form select:focus {
       outline: none;
       border-color: var(--accent-2);
-      box-shadow: 0 0 0 3px rgba(78,205,196,0.15);
+      box-shadow: 0 0 0 3px rgba(78,205,255,0.18);
     }
     .form button {
       align-self: flex-start;
       cursor: pointer;
       border: 1.5px solid var(--accent);
+      padding: 0.95rem 2rem;
+      font-size: 0.9rem;
     }
     .form-msg {
       min-height: 1.2em;
-      font-size: 0.9rem;
-      color: var(--turquoise);
+      font-size: 0.95rem;
+      color: var(--electric);
       margin: 0;
+    }
+
+    .signoff {
+      padding: 3rem 0 1rem;
+      text-align: center;
+    }
+    .center { text-align: center; }
+    .mantra {
+      font-family: var(--font-serif);
+      font-size: 1.35rem;
+      color: var(--fg-muted);
+      line-height: 1.5;
+      margin: 0;
+    }
+    .mantra em {
+      color: var(--accent);
+      font-style: italic;
     }
 
     @media (min-width: 760px) {
@@ -138,7 +223,7 @@ import outdoorPhoto from "../assets/photos/outdoor-purple.jpg";
             body: JSON.stringify(Object.fromEntries(fd)),
           });
           if (res.ok) {
-            msg.textContent = "✨ Thanks — message sent.";
+            msg.textContent = "🎸 Got it — talk soon.";
             form.reset();
           } else {
             msg.textContent = "Something went wrong. Try again?";

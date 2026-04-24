@@ -61,6 +61,11 @@ function typeLabel(t: string) {
                   <span class="muted coming">Streaming links coming soon</span>
                 )}
               </div>
+              <p class="song-note">
+                <a href={`/contact?re=${encodeURIComponent(r.title)}`}>
+                  Drop Joe a line about this one →
+                </a>
+              </p>
             </div>
           </article>
         ))}
@@ -69,6 +74,19 @@ function typeLabel(t: string) {
   </section>
 
   <style>
+    .song-note {
+      margin: 1.25rem 0 0;
+      font-size: 0.9rem;
+    }
+    .song-note a {
+      color: var(--fg-muted);
+      font-style: italic;
+      letter-spacing: 0.02em;
+    }
+    .song-note a:hover {
+      color: var(--accent);
+    }
+
     .page-hero {
       padding: 4rem 0 2rem;
       text-align: center;
