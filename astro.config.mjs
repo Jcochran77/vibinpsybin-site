@@ -1,5 +1,5 @@
 // @ts-check
-import { defineConfig, sharpImageService } from 'astro/config';
+import { defineConfig, passthroughImageService } from 'astro/config';
 import { loadEnv } from 'vite';
 
 const env = loadEnv(process.env.NODE_ENV ?? 'development', process.cwd(), '');
@@ -13,9 +13,11 @@ export default defineConfig({
   site: 'https://vibinpsybin.band',
   trailingSlash: 'never',
   image: {
-    // Force Sharp at build time so static output gets pre-generated
-    // webp files (instead of dynamic /_image?... URLs that 404 on a
-    // no-server Cloudflare Pages deploy).
-    service: sharpImageService(),
+    // Use the passthrough image service. Cloudflare Workers Builds was
+    // not loading Sharp (even with it explicitly configured), so the
+    // built HTML fell back to dynamic /_image?... URLs that 404 on a
+    // no-server deploy. Passthrough emits the original asset URL as a
+    // static file — no image service required at build or runtime.
+    service: passthroughImageService(),
   },
 });
