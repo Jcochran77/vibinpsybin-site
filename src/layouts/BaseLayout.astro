@@ -1,4 +1,8 @@
 ---
+import { Image } from "astro:assets";
+import scriptLogo from "../assets/logos/vpsb-script-logo.png";
+import circleLogo from "../assets/logos/vpsb-circle-logo.png";
+
 export interface Props {
   title?: string;
   description?: string;
@@ -14,11 +18,13 @@ const nav = [
   { href: "/music", label: "Music" },
   { href: "/videos", label: "Videos" },
   { href: "/shows", label: "Shows" },
-  { href: "/contact", label: "Contact" },
   { href: "/producer", label: "Production" },
+  { href: "/contact", label: "Contact" },
 ];
 
 const path = Astro.url.pathname;
+const isActive = (href: string) =>
+  path === href || (href !== "/" && path.startsWith(href));
 ---
 
 <!doctype html>
@@ -28,22 +34,29 @@ const path = Astro.url.pathname;
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
     <title>{title}</title>
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.png" type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unica+One&family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
+    <meta property="og:image" content="/images/og-logo.png" />
+    <meta name="theme-color" content="#0b0912" />
   </head>
   <body>
-    <header>
-      <div class="brand">
-        <a href="/" class="logo">Vibin&rsquo; Psybin<span>&nbsp;&amp; the Sunlight Band</span></a>
-      </div>
-      <nav>
+    <div class="grain" aria-hidden="true"></div>
+
+    <header class="site-header">
+      <a href="/" class="brand" aria-label="Vibin' Psybin and the Sunlight Band — home">
+        <Image src={scriptLogo} alt="Vibin' Psybin and the Sunlight Band" widths={[240, 360, 480]} sizes="(max-width: 720px) 200px, 280px" loading="eager" class="brand-logo" />
+      </a>
+      <nav aria-label="Primary">
         {
           nav.map((item) => (
             <a
               href={item.href}
-              class:list={[{ active: path === item.href || (item.href !== "/" && path.startsWith(item.href)) }]}
+              class:list={[{ active: isActive(item.href) }]}
             >
               {item.label}
             </a>
@@ -56,22 +69,58 @@ const path = Astro.url.pathname;
       <slot />
     </main>
 
-    <footer>
-      <p>&copy; {new Date().getFullYear()} Vibin&rsquo; Psybin and the Sunlight Band. Nashville, TN.</p>
-      <p class="fine-print">
-        No tracking. No ads. No algorithm. Just the music.
-      </p>
+    <footer class="site-footer">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <Image src={circleLogo} alt="" widths={[120, 200]} sizes="120px" class="circle-mark" />
+          <p class="footer-name">Vibin&rsquo; Psybin<br/><span>&amp; the Sunlight Band</span></p>
+        </div>
+        <div class="footer-links">
+          <a href="/music">Music</a>
+          <a href="/videos">Videos</a>
+          <a href="/shows">Shows</a>
+          <a href="/contact">Contact</a>
+        </div>
+        <div class="footer-mantra">
+          <p>No tracking. No ads. No algorithm.</p>
+          <p><em>Just the music.</em></p>
+        </div>
+      </div>
+      <p class="copy">&copy; {new Date().getFullYear()} Vibin&rsquo; Psybin and the Sunlight Band &middot; Nashville, TN</p>
     </footer>
 
     <style is:global>
       :root {
-        --bg: #0d0a14;
-        --bg-alt: #17121f;
-        --fg: #f5efe4;
-        --fg-muted: #a89d8a;
-        --accent: #e8a33d;
-        --accent-dim: #b07a24;
-        --line: #2a2233;
+        /* Deep nighttime base */
+        --bg:        #0b0912;
+        --bg-alt:    #15101f;
+        --bg-elev:   #1d1630;
+
+        /* Warm cream text */
+        --fg:        #f5efe4;
+        --fg-muted:  #b8ad9a;
+        --fg-dim:    #7a715f;
+
+        /* Hippie-cowboy palette */
+        --turquoise: #4ecdc4;
+        --turquoise-dim: #2a8f87;
+        --amber:     #f2b544;
+        --amber-dim: #b07a24;
+        --peach:     #f28b6b;
+        --lavender:  #a88fc8;
+
+        --accent:    var(--amber);
+        --accent-2:  var(--turquoise);
+
+        --line:      #2d2340;
+        --line-soft: #1e1830;
+
+        /* Fonts */
+        --font-display: "Unica One", "Bebas Neue", Impact, sans-serif;
+        --font-serif:   "DM Serif Display", ui-serif, Georgia, serif;
+        --font-sans:    "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+        --maxw: 1200px;
       }
 
       * { box-sizing: border-box; }
@@ -81,89 +130,268 @@ const path = Astro.url.pathname;
         padding: 0;
         background: var(--bg);
         color: var(--fg);
-        font-family: ui-serif, Georgia, "Times New Roman", serif;
+        font-family: var(--font-sans);
+        font-size: 17px;
         line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
       }
 
       body {
         display: flex;
         flex-direction: column;
         min-height: 100vh;
+        position: relative;
+        overflow-x: hidden;
       }
 
-      a { color: var(--accent); text-decoration: none; }
-      a:hover { text-decoration: underline; }
+      /* Subtle film grain — adds texture without distraction */
+      .grain {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 1;
+        opacity: 0.06;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        mix-blend-mode: overlay;
+      }
 
-      header {
+      a {
+        color: var(--accent);
+        text-decoration: none;
+        transition: color 0.15s ease;
+      }
+      a:hover { color: var(--fg); }
+
+      /* Header */
+      .site-header {
+        position: relative;
+        z-index: 10;
         padding: 1.5rem 2rem;
-        border-bottom: 1px solid var(--line);
         display: flex;
         flex-direction: column;
-        gap: 1rem;
+        gap: 1.25rem;
+        align-items: center;
+        text-align: center;
       }
 
-      .brand .logo {
-        font-size: 1.6rem;
-        font-weight: 600;
-        color: var(--fg);
-        letter-spacing: 0.02em;
+      .brand {
+        display: inline-block;
+        line-height: 0;
       }
-      .brand .logo span {
-        color: var(--fg-muted);
-        font-weight: 400;
-        font-style: italic;
+      .brand-logo {
+        width: 240px;
+        height: auto;
+        filter: invert(1) brightness(0.98);
       }
 
-      nav {
+      nav[aria-label="Primary"] {
         display: flex;
         gap: 1.5rem;
         flex-wrap: wrap;
+        justify-content: center;
       }
-      nav a {
+      nav[aria-label="Primary"] a {
         color: var(--fg-muted);
-        font-family: ui-sans-serif, system-ui, sans-serif;
-        font-size: 0.95rem;
+        font-family: var(--font-sans);
+        font-size: 0.82rem;
+        font-weight: 500;
         text-transform: uppercase;
-        letter-spacing: 0.08em;
+        letter-spacing: 0.18em;
+        padding: 0.25rem 0;
+        border-bottom: 1px solid transparent;
+        transition: all 0.15s ease;
       }
-      nav a.active { color: var(--accent); }
-      nav a:hover { color: var(--fg); text-decoration: none; }
+      nav[aria-label="Primary"] a:hover {
+        color: var(--fg);
+        border-bottom-color: var(--accent-2);
+      }
+      nav[aria-label="Primary"] a.active {
+        color: var(--accent);
+        border-bottom-color: var(--accent);
+      }
 
+      /* Main */
       main {
         flex: 1;
-        padding: 2rem;
-        max-width: 1100px;
+        position: relative;
+        z-index: 2;
         width: 100%;
-        margin: 0 auto;
       }
 
-      h1, h2, h3 {
-        font-family: ui-serif, Georgia, serif;
+      /* Typography */
+      h1, h2, h3, h4 {
+        font-family: var(--font-serif);
         color: var(--fg);
-        line-height: 1.2;
+        line-height: 1.1;
+        font-weight: 400;
+        margin: 0 0 0.75rem;
       }
-      h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
-      h2 { font-size: 1.8rem; margin-top: 2.5rem; }
+
+      h1 {
+        font-size: clamp(2.25rem, 5.5vw, 4rem);
+        letter-spacing: -0.01em;
+      }
+      h2 {
+        font-size: clamp(1.6rem, 3vw, 2.25rem);
+        margin-top: 2.5rem;
+      }
+      h3 { font-size: 1.3rem; }
+
+      p { margin: 0 0 1rem; }
 
       .muted { color: var(--fg-muted); }
+      .dim { color: var(--fg-dim); }
 
-      footer {
-        padding: 2rem;
-        border-top: 1px solid var(--line);
-        text-align: center;
-        color: var(--fg-muted);
-        font-family: ui-sans-serif, system-ui, sans-serif;
-        font-size: 0.85rem;
+      /* Utility: section wrap */
+      .wrap {
+        max-width: var(--maxw);
+        margin: 0 auto;
+        padding: 0 1.5rem;
       }
-      .fine-print { font-style: italic; opacity: 0.7; margin-top: 0.5rem; }
+      .wrap-narrow {
+        max-width: 780px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+      }
 
-      @media (min-width: 720px) {
-        header {
+      /* Buttons */
+      .btn {
+        display: inline-block;
+        padding: 0.85rem 1.75rem;
+        border: 1.5px solid var(--accent);
+        color: var(--accent);
+        border-radius: 2px;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        font-size: 0.85rem;
+        font-weight: 600;
+        font-family: var(--font-sans);
+        transition: all 0.2s ease;
+      }
+      .btn:hover {
+        background: var(--accent);
+        color: var(--bg);
+      }
+      .btn-solid {
+        background: var(--accent);
+        color: var(--bg);
+      }
+      .btn-solid:hover {
+        background: var(--turquoise);
+        border-color: var(--turquoise);
+        color: var(--bg);
+      }
+
+      /* Display type eyebrow/tag */
+      .eyebrow {
+        font-family: var(--font-sans);
+        font-size: 0.78rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.22em;
+        color: var(--accent-2);
+        margin: 0 0 0.75rem;
+      }
+
+      /* Footer */
+      .site-footer {
+        position: relative;
+        z-index: 2;
+        margin-top: 5rem;
+        padding: 3rem 2rem 1.5rem;
+        border-top: 1px solid var(--line);
+        background: var(--bg-alt);
+      }
+      .footer-grid {
+        max-width: var(--maxw);
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        text-align: center;
+      }
+      .footer-brand {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+      }
+      .circle-mark {
+        width: 72px;
+        height: 72px;
+        filter: invert(1) brightness(0.95);
+        opacity: 0.85;
+      }
+      .footer-name {
+        font-family: var(--font-serif);
+        font-size: 1.15rem;
+        color: var(--fg);
+        margin: 0;
+        line-height: 1.25;
+      }
+      .footer-name span {
+        color: var(--fg-muted);
+        font-style: italic;
+        font-size: 0.95rem;
+      }
+      .footer-links {
+        display: flex;
+        gap: 1.5rem;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .footer-links a {
+        color: var(--fg-muted);
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+      }
+      .footer-links a:hover { color: var(--accent); }
+      .footer-mantra p {
+        color: var(--fg-dim);
+        margin: 0;
+        font-size: 0.9rem;
+      }
+      .footer-mantra em {
+        color: var(--accent-2);
+        font-style: italic;
+      }
+      .copy {
+        text-align: center;
+        color: var(--fg-dim);
+        font-size: 0.78rem;
+        margin: 2rem 0 0;
+        letter-spacing: 0.08em;
+      }
+
+      /* Responsive */
+      @media (min-width: 760px) {
+        .site-header {
           flex-direction: row;
           justify-content: space-between;
+          padding: 1.75rem 3rem;
+          text-align: left;
+        }
+        .brand-logo { width: 280px; }
+        nav[aria-label="Primary"] {
+          justify-content: flex-end;
+        }
+        .footer-grid {
+          grid-template-columns: 1fr 1fr 1fr;
+          text-align: left;
           align-items: center;
         }
+        .footer-brand { align-items: flex-start; }
+        .footer-links { justify-content: center; }
+        .footer-mantra { text-align: right; }
       }
+
+      /* Section helper */
+      section.band {
+        padding: 4rem 0;
+        border-top: 1px solid var(--line-soft);
+      }
+      section.band:first-child { border-top: none; padding-top: 2rem; }
     </style>
   </body>
 </html>

@@ -1,7 +1,11 @@
 ---
+import { Image } from "astro:assets";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { fetchShows } from "../lib/bandsintown";
 import releases from "../data/releases.json";
+import heroPhoto from "../assets/photos/hero-turquoise-suit.jpg";
+import circleLogo from "../assets/logos/vpsb-circle-logo.png";
+import hippieCowboyArt from "../assets/covers/hippie-cowboy.jpg";
 
 const upcomingShows = await fetchShows("upcoming");
 const nextShow = upcomingShows[0];
@@ -9,176 +13,392 @@ const latestRelease = releases[0];
 
 function formatDate(iso: string) {
   const d = new Date(iso);
-  return d.toLocaleDateString("en-US", {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
+  return {
+    weekday: d.toLocaleDateString("en-US", { weekday: "long" }),
+    monthDay: d.toLocaleDateString("en-US", { month: "long", day: "numeric" }),
+    year: d.getFullYear(),
+    time: d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }),
+  };
 }
+
+function daysUntil(iso: string): number {
+  const target = new Date(iso).getTime();
+  const now = Date.now();
+  return Math.ceil((target - now) / (1000 * 60 * 60 * 24));
+}
+
+const nextShowF = nextShow ? formatDate(nextShow.datetime) : null;
+const nextShowDays = nextShow ? daysUntil(nextShow.datetime) : null;
+
+function showEyebrow(days: number | null): string {
+  if (days === null) return "Next show";
+  if (days <= 0) return "Tonight";
+  if (days === 1) return "Tomorrow night";
+  if (days <= 7) return `In ${days} days`;
+  return "Next show";
+}
+const eyebrowLabel = showEyebrow(nextShowDays);
 ---
 
 <BaseLayout>
+  <!-- HERO -->
   <section class="hero">
-    <h1>Vibin&rsquo; Psybin<br /><span class="amp">&amp;</span> the Sunlight Band</h1>
-    <p class="tagline">
-      Nashville. Psychedelic. Cosmic country. Direct from us to you.
-    </p>
+    <div class="hero-bg">
+      <Image
+        src={heroPhoto}
+        alt="Joe Psybin in a turquoise western suit, holding a cream Telecaster"
+        widths={[720, 1080, 1440, 1920]}
+        sizes="100vw"
+        loading="eager"
+        class="hero-img"
+      />
+      <div class="hero-overlay" aria-hidden="true"></div>
+    </div>
+
+    <div class="hero-content wrap">
+      <Image src={circleLogo} alt="" widths={[140, 220]} sizes="140px" class="hero-mark" />
+      <h1 class="hero-title">
+        <span class="line-1">Psychedelic</span>
+        <span class="line-2">Cosmic</span>
+        <span class="line-3">Country</span>
+      </h1>
+      <p class="hero-sub">
+        Vibin&rsquo; Psybin &amp; the Sunlight Band &middot; Nashville, TN
+      </p>
+      <div class="hero-ctas">
+        <a class="btn btn-solid" href="/music">Listen</a>
+        {nextShow && <a class="btn" href="/shows">Upcoming shows</a>}
+      </div>
+    </div>
+
+    <div class="scroll-hint" aria-hidden="true">↓</div>
   </section>
 
-  {nextShow && (
-    <section class="card">
-      <h2>Next show</h2>
-      <p class="big">{formatDate(nextShow.datetime)}</p>
-      <p><strong>{nextShow.venue}</strong> &middot; {nextShow.city}</p>
-      {nextShow.ticketUrl ? (
-        <p><a class="btn" href={nextShow.ticketUrl}>Get tickets</a></p>
-      ) : (
-        <p><a href="/shows">See all shows &rarr;</a></p>
-      )}
+  <!-- NEXT SHOW (featured) -->
+  {nextShow && nextShowF && (
+    <section class="band next-show-section">
+      <div class="wrap">
+        <div class="next-show">
+          <div class="next-show-meta">
+            <p class="eyebrow">{eyebrowLabel}</p>
+            <h2 class="show-title">{nextShow.venue}</h2>
+            <p class="show-location">{nextShow.city}</p>
+          </div>
+          <div class="next-show-date">
+            <div class="date-block">
+              <span class="date-weekday">{nextShowF.weekday}</span>
+              <span class="date-monthday">{nextShowF.monthDay}</span>
+              <span class="date-time">{nextShowF.time}</span>
+            </div>
+          </div>
+          <div class="next-show-cta">
+            {nextShow.ticketUrl ? (
+              <a class="btn btn-solid" href={nextShow.ticketUrl}>Get tickets</a>
+            ) : (
+              <a class="btn" href="/shows">Details</a>
+            )}
+          </div>
+        </div>
+      </div>
     </section>
   )}
 
+  <!-- LATEST RELEASE -->
   {latestRelease && (
-    <section class="card">
-      <h2>Latest release</h2>
-      <p class="big">{latestRelease.title}</p>
-      <p class="muted">{latestRelease.artist} &middot; {latestRelease.year}</p>
-      <p><a href="/music">Listen &rarr;</a></p>
+    <section class="band release-section">
+      <div class="wrap">
+        <div class="release-feature">
+          <div class="release-art">
+            <Image
+              src={hippieCowboyArt}
+              alt={`${latestRelease.title} album art`}
+              widths={[400, 600, 900]}
+              sizes="(max-width: 760px) 90vw, 500px"
+              class="release-art-img"
+            />
+          </div>
+          <div class="release-info">
+            <p class="eyebrow">Latest release</p>
+            <h2>{latestRelease.title}</h2>
+            <p class="muted">{latestRelease.artist} &middot; {latestRelease.year}</p>
+            {latestRelease.notes && <p class="release-notes">{latestRelease.notes}</p>}
+            <div class="release-ctas">
+              {latestRelease.appleMusicUrl && (
+                <a class="btn" href={latestRelease.appleMusicUrl}>Apple Music</a>
+              )}
+              <a class="btn btn-solid" href="/music">All releases</a>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
   )}
 
-  <section class="signup">
-    <h2>Stay in the loop</h2>
-    <p>
-      New shows, new songs, new videos. No spam, no algorithm, no daily noise.
-      One email when there&rsquo;s something worth telling you.
-    </p>
+  <!-- SIGNUP -->
+  <section class="band signup-section">
+    <div class="wrap-narrow signup">
+      <p class="eyebrow">Stay in the loop</p>
+      <h2>One email. Only when it matters.</h2>
+      <p class="muted">
+        New shows, new songs, new videos. No spam, no algorithm, no daily noise.
+      </p>
 
-    <form
-      id="email-signup"
-      action="/api/subscribe"
-      method="POST"
-      class="form"
-    >
-      <label for="email" class="sr-only">Email address</label>
-      <input
-        id="email"
-        name="email"
-        type="email"
-        required
-        autocomplete="email"
-        placeholder="your@email.com"
-      />
-      <button type="submit">Sign up</button>
-    </form>
-    <p class="form-msg" id="form-msg" aria-live="polite"></p>
+      <form id="email-signup" action="/api/subscribe" method="POST" class="form">
+        <label for="email" class="sr-only">Email address</label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          required
+          autocomplete="email"
+          placeholder="your@email.com"
+        />
+        <button type="submit" class="btn btn-solid">Sign up</button>
+      </form>
+      <p class="form-msg" id="form-msg" aria-live="polite"></p>
+    </div>
   </section>
 
   <style>
+    /* HERO */
     .hero {
-      padding: 3rem 0 2rem;
+      position: relative;
+      min-height: 85vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       text-align: center;
+      overflow: hidden;
+      margin-bottom: 0;
     }
-    .hero h1 {
-      font-size: 3rem;
-      letter-spacing: 0.01em;
-      margin: 0 0 0.5rem;
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
     }
-    .hero .amp {
-      color: var(--accent);
-      font-style: italic;
+    .hero-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 35%;
     }
-    .tagline {
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at center, rgba(11,9,18,0.35) 0%, rgba(11,9,18,0.85) 80%),
+        linear-gradient(180deg, rgba(11,9,18,0.4) 0%, rgba(11,9,18,0.95) 100%);
+    }
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      padding: 4rem 1.5rem;
+    }
+    .hero-mark {
+      width: 120px;
+      height: auto;
+      filter: invert(1) brightness(0.95);
+      opacity: 0.9;
+      margin: 0 auto 1.5rem;
+      display: block;
+    }
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 11vw, 8rem);
+      line-height: 0.95;
+      letter-spacing: 0.02em;
+      margin: 0.5rem 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.1em;
+    }
+    .hero-title .line-1 { color: var(--fg); }
+    .hero-title .line-2 { color: var(--amber); font-style: italic; font-family: var(--font-serif); letter-spacing: -0.01em; }
+    .hero-title .line-3 { color: var(--turquoise); }
+
+    .hero-sub {
+      font-family: var(--font-sans);
+      font-size: clamp(0.85rem, 1.8vw, 1.05rem);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
       color: var(--fg-muted);
-      font-size: 1.1rem;
-      font-style: italic;
-      max-width: 36rem;
-      margin: 0.5rem auto 0;
+      margin: 1.5rem 0 2rem;
     }
-    .card {
+    .hero-ctas {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .scroll-hint {
+      position: absolute;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      color: var(--fg-muted);
+      font-size: 1.5rem;
+      animation: bounce 2s ease-in-out infinite;
+      z-index: 3;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translate(-50%, 0); opacity: 0.5; }
+      50% { transform: translate(-50%, 10px); opacity: 1; }
+    }
+
+    /* NEXT SHOW */
+    .next-show-section {
+      background: linear-gradient(180deg, var(--bg) 0%, var(--bg-alt) 100%);
+    }
+    .next-show {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      align-items: center;
+      padding: 2rem;
       border: 1px solid var(--line);
-      border-radius: 6px;
-      padding: 1.5rem 2rem;
-      margin: 2rem 0;
+      border-radius: 4px;
+      background: var(--bg-alt);
+      position: relative;
+    }
+    .next-show::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 85% 30%, rgba(78,205,196,0.08), transparent 60%);
+      pointer-events: none;
+      border-radius: 4px;
+    }
+    .next-show > * { position: relative; z-index: 1; }
+
+    .show-title {
+      font-family: var(--font-serif);
+      font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+      margin: 0.25rem 0;
+      color: var(--fg);
+    }
+    .show-location {
+      color: var(--fg-muted);
+      font-size: 1rem;
+      margin: 0;
+    }
+    .date-block {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.2rem;
+      border-left: 3px solid var(--accent-2);
+      padding-left: 1.2rem;
+    }
+    .date-weekday {
+      font-family: var(--font-sans);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--accent-2);
+    }
+    .date-monthday {
+      font-family: var(--font-serif);
+      font-size: 1.8rem;
+      color: var(--fg);
+      line-height: 1.1;
+    }
+    .date-time {
+      font-family: var(--font-sans);
+      color: var(--fg-muted);
+      font-size: 0.9rem;
+    }
+    .next-show-cta { align-self: center; }
+
+    @media (min-width: 760px) {
+      .next-show {
+        grid-template-columns: 1fr auto auto;
+        gap: 2.5rem;
+        padding: 2.5rem 3rem;
+      }
+    }
+
+    /* RELEASE FEATURE */
+    .release-feature {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+      align-items: center;
+    }
+    .release-art {
+      position: relative;
+    }
+    .release-art-img {
+      width: 100%;
+      height: auto;
+      max-width: 500px;
+      margin: 0 auto;
+      display: block;
+      border-radius: 3px;
+      box-shadow:
+        0 0 60px rgba(78,205,196,0.12),
+        0 20px 40px rgba(0,0,0,0.5);
+    }
+    .release-info h2 { margin-top: 0.5rem; }
+    .release-notes {
+      color: var(--fg-muted);
+      font-size: 1.05rem;
+      margin: 1rem 0 1.5rem;
+    }
+    .release-ctas {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    @media (min-width: 760px) {
+      .release-feature {
+        grid-template-columns: 1fr 1.1fr;
+        gap: 4rem;
+      }
+    }
+
+    /* SIGNUP */
+    .signup-section {
       background: var(--bg-alt);
     }
-    .card h2 {
-      margin-top: 0;
-      color: var(--accent);
-      font-size: 1rem;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-    }
-    .big {
-      font-size: 1.4rem;
-      margin: 0.5rem 0;
-    }
-    .btn {
-      display: inline-block;
-      padding: 0.6rem 1.5rem;
-      border: 1px solid var(--accent);
-      color: var(--accent);
-      border-radius: 4px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      font-size: 0.9rem;
-      font-family: ui-sans-serif, system-ui, sans-serif;
-    }
-    .btn:hover {
-      background: var(--accent);
-      color: var(--bg);
-      text-decoration: none;
-    }
     .signup {
-      padding: 3rem 0 1rem;
       text-align: center;
+      padding: 2rem 1.5rem;
     }
-    .signup p {
-      max-width: 36rem;
-      margin: 0.5rem auto 1.5rem;
-      color: var(--fg-muted);
-    }
+    .signup h2 { margin-top: 0.5rem; }
     .form {
       display: flex;
       gap: 0.5rem;
       max-width: 30rem;
-      margin: 0 auto;
+      margin: 1.5rem auto 0;
       flex-wrap: wrap;
       justify-content: center;
     }
     .form input {
       flex: 1 1 18rem;
-      padding: 0.75rem 1rem;
-      background: var(--bg-alt);
+      padding: 0.85rem 1rem;
+      background: var(--bg);
       border: 1px solid var(--line);
       color: var(--fg);
-      border-radius: 4px;
-      font-family: inherit;
+      border-radius: 2px;
+      font-family: var(--font-sans);
       font-size: 1rem;
     }
     .form input:focus {
       outline: none;
-      border-color: var(--accent);
+      border-color: var(--accent-2);
+      box-shadow: 0 0 0 3px rgba(78,205,196,0.15);
     }
     .form button {
-      padding: 0.75rem 1.5rem;
-      background: var(--accent);
-      border: none;
-      color: var(--bg);
-      border-radius: 4px;
-      font-family: ui-sans-serif, system-ui, sans-serif;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
       cursor: pointer;
+      border: 1.5px solid var(--accent);
     }
-    .form button:hover { background: var(--accent-dim); }
     .form-msg {
       max-width: 30rem;
       margin: 0.75rem auto 0;
       min-height: 1.2em;
       font-size: 0.9rem;
+      color: var(--turquoise);
     }
     .sr-only {
       position: absolute;

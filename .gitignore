@@ -18,6 +18,9 @@ dist/
 *.swp
 *.swo
 
+# raw asset drop zone (not source of truth; use src/assets/ for committed assets)
+assets-inbox/
+
 # logs
 npm-debug.log*
 yarn-debug.log*

@@ -6,55 +6,96 @@ const realVideos = videos.filter((v) => v.youtubeId);
 ---
 
 <BaseLayout title="Videos — Vibin' Psybin and the Sunlight Band">
-  <h1>Videos</h1>
-  <p class="muted">Music videos and visuals. Uploaded to YouTube, embedded here.</p>
-
-  {realVideos.length === 0 ? (
-    <p class="coming-soon">Music videos are being uploaded. Check back soon.</p>
-  ) : (
-    <div class="grid">
-      {realVideos.map((v) => (
-        <div class="video">
-          <div class="frame">
-            <iframe
-              src={`https://www.youtube-nocookie.com/embed/${v.youtubeId}`}
-              title={v.title}
-              frameborder="0"
-              allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowfullscreen
-            ></iframe>
-          </div>
-          <p class="title">{v.title}</p>
-        </div>
-      ))}
+  <section class="band page-hero">
+    <div class="wrap-narrow">
+      <p class="eyebrow">Watch</p>
+      <h1>Videos</h1>
+      <p class="lead muted">
+        Music videos and visuals. Uploaded to YouTube, embedded here.
+      </p>
     </div>
-  )}
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      {realVideos.length === 0 ? (
+        <div class="coming-soon">
+          <p class="eyebrow">Coming soon</p>
+          <p class="empty-msg">Music videos are in the works.<br/>Sign up on the <a href="/">home page</a> to know when they drop.</p>
+        </div>
+      ) : (
+        <div class="grid">
+          {realVideos.map((v) => (
+            <div class="video">
+              <div class="frame">
+                <iframe
+                  src={`https://www.youtube-nocookie.com/embed/${v.youtubeId}`}
+                  title={v.title}
+                  frameborder="0"
+                  allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowfullscreen
+                ></iframe>
+              </div>
+              <p class="title">{v.title}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
 
   <style>
+    .page-hero {
+      padding: 4rem 0 2rem;
+      text-align: center;
+    }
+    .lead {
+      font-size: 1.1rem;
+      max-width: 42rem;
+      margin: 0.5rem auto 0;
+    }
+
     .coming-soon {
-      padding: 3rem;
+      padding: 5rem 2rem;
       text-align: center;
       border: 1px dashed var(--line);
-      border-radius: 6px;
-      color: var(--fg-muted);
-      font-style: italic;
-      margin-top: 2rem;
+      border-radius: 4px;
+      margin-top: 1.5rem;
+      background: var(--bg-alt);
+      position: relative;
+      overflow: hidden;
     }
+    .coming-soon::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 50%, rgba(78,205,196,0.04), transparent 60%);
+    }
+    .coming-soon > * { position: relative; }
+    .empty-msg {
+      color: var(--fg-muted);
+      font-family: var(--font-serif);
+      font-size: 1.25rem;
+      line-height: 1.5;
+      margin: 0.5rem 0 0;
+    }
+
     .grid {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 2rem;
-      margin-top: 2rem;
+      gap: 2.5rem;
+      margin-top: 1.5rem;
     }
-    @media (min-width: 720px) {
+    @media (min-width: 760px) {
       .grid { grid-template-columns: 1fr 1fr; }
     }
     .frame {
       position: relative;
       padding-bottom: 56.25%;
       background: #000;
-      border-radius: 6px;
+      border-radius: 3px;
       overflow: hidden;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.4);
     }
     .frame iframe {
       position: absolute;
@@ -62,6 +103,11 @@ const realVideos = videos.filter((v) => v.youtubeId);
       width: 100%; height: 100%;
       border: 0;
     }
-    .video .title { margin-top: 0.5rem; color: var(--fg); }
+    .video .title {
+      margin: 0.75rem 0 0;
+      color: var(--fg);
+      font-family: var(--font-serif);
+      font-size: 1.25rem;
+    }
   </style>
 </BaseLayout>

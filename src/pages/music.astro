@@ -1,79 +1,196 @@
 ---
+import { Image } from "astro:assets";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import releases from "../data/releases.json";
+import hippieCowboyArt from "../assets/covers/hippie-cowboy.jpg";
+import singleCover from "../assets/covers/vpsb-single-2.jpg";
+
+// Map release id → cover art asset
+const coverMap: Record<string, ImageMetadata> = {
+  "hippie-cowboy": hippieCowboyArt,
+  // Fallback for solo singles without dedicated art — use VPSB single cover as placeholder
+  "live-fast-ep": singleCover,
+};
+
+function typeLabel(t: string) {
+  return t === "ep" ? "EP" : t.charAt(0).toUpperCase() + t.slice(1);
+}
 ---
 
 <BaseLayout title="Music — Vibin' Psybin and the Sunlight Band">
-  <h1>Music</h1>
-  <p class="muted">Every release, ordered newest first.</p>
+  <section class="band page-hero">
+    <div class="wrap-narrow">
+      <p class="eyebrow">Discography</p>
+      <h1>Music</h1>
+      <p class="lead muted">
+        Every release, newest first. Solo work as <em>Psybin</em>, band records as <em>Vibin&rsquo; Psybin and the Sunlight Band</em>.
+      </p>
+    </div>
+  </section>
 
-  <div class="grid">
-    {releases.map((r) => (
-      <article class="release">
-        <header>
-          <h2>{r.title}</h2>
-          <p class="meta">
-            <span>{r.artist}</span> &middot;
-            <span>{r.year}</span> &middot;
-            <span class="type">{r.type}</span>
-          </p>
-        </header>
-        {r.tracks && (
-          <ol class="tracks">
-            {r.tracks.map((t) => <li>{t}</li>)}
-          </ol>
-        )}
-        {r.notes && <p class="notes">{r.notes}</p>}
-        <div class="links">
-          {r.appleMusicUrl && <a href={r.appleMusicUrl}>Apple Music</a>}
-          {!r.appleMusicUrl && <span class="muted">Streaming links coming soon</span>}
-        </div>
-      </article>
-    ))}
-  </div>
+  <section class="band releases">
+    <div class="wrap">
+      <div class="release-list">
+        {releases.map((r, idx) => {
+          const cover = coverMap[r.id];
+          return (
+            <article class={`release release-${idx % 2 === 0 ? "left" : "right"}`}>
+              <div class="release-cover">
+                {cover ? (
+                  <Image
+                    src={cover}
+                    alt={`${r.title} cover art`}
+                    widths={[300, 500, 700]}
+                    sizes="(max-width: 760px) 90vw, 400px"
+                  />
+                ) : (
+                  <div class="cover-placeholder">
+                    <span class="cover-title">{r.title}</span>
+                  </div>
+                )}
+              </div>
+              <div class="release-body">
+                <p class="eyebrow">{typeLabel(r.type)} &middot; {r.year}</p>
+                <h2>{r.title}</h2>
+                <p class="artist">{r.artist}</p>
+                {r.tracks && (
+                  <ol class="tracks">
+                    {r.tracks.map((t) => <li>{t}</li>)}
+                  </ol>
+                )}
+                {r.notes && <p class="notes">{r.notes}</p>}
+                <div class="links">
+                  {r.appleMusicUrl && <a class="btn" href={r.appleMusicUrl}>Apple Music</a>}
+                  {!r.appleMusicUrl && <span class="muted coming">Streaming links coming soon</span>}
+                </div>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    </div>
+  </section>
 
   <style>
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 2rem;
+    .page-hero {
+      padding: 4rem 0 2rem;
+      text-align: center;
+    }
+    .lead {
+      font-size: 1.1rem;
+      max-width: 42rem;
+      margin: 0.5rem auto 0;
+    }
+
+    .release-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4rem;
       margin-top: 2rem;
     }
-    @media (min-width: 720px) {
-      .grid { grid-template-columns: 1fr 1fr; }
-    }
+
     .release {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      align-items: center;
+    }
+    .release-cover {
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    .release-cover img {
+      width: 100%;
+      height: auto;
+      border-radius: 3px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+      transition: transform 0.4s ease;
+    }
+    .release:hover .release-cover img {
+      transform: scale(1.02);
+    }
+    .cover-placeholder {
+      aspect-ratio: 1 / 1;
+      background: linear-gradient(135deg, var(--bg-alt) 0%, var(--bg-elev) 100%);
       border: 1px solid var(--line);
-      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       padding: 1.5rem;
-      background: var(--bg-alt);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
     }
-    .release h2 {
-      margin-top: 0;
+    .cover-placeholder::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 30% 30%, rgba(78,205,196,0.1) 0%, transparent 60%);
+    }
+    .cover-title {
+      font-family: var(--font-serif);
       font-size: 1.5rem;
-    }
-    .meta {
       color: var(--fg-muted);
-      font-size: 0.9rem;
-      margin: 0.25rem 0 1rem;
+      position: relative;
     }
-    .type {
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      font-size: 0.75rem;
-      color: var(--accent);
+
+    .release-body .eyebrow {
+      color: var(--accent-2);
+    }
+    .release-body h2 {
+      margin-top: 0.25rem;
+      font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+    }
+    .artist {
+      color: var(--fg-muted);
+      font-style: italic;
+      margin: 0 0 1rem;
     }
     .tracks {
-      padding-left: 1.25rem;
-      margin: 0.5rem 0 1rem;
+      list-style: none;
+      padding: 0;
+      margin: 1rem 0;
+      counter-reset: track;
+      border-top: 1px solid var(--line-soft);
+    }
+    .tracks li {
+      counter-increment: track;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--line-soft);
+      font-family: var(--font-sans);
       color: var(--fg);
+      display: flex;
+      align-items: baseline;
+      gap: 0.75rem;
     }
-    .tracks li { margin: 0.2rem 0; }
+    .tracks li::before {
+      content: counter(track, decimal-leading-zero);
+      color: var(--accent-2);
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      min-width: 1.5em;
+    }
     .notes {
-      font-style: italic;
       color: var(--fg-muted);
-      margin: 0.5rem 0 1rem;
+      font-style: italic;
+      margin: 1rem 0 1.5rem;
     }
-    .links { margin-top: 0.5rem; }
+    .links { margin-top: 1rem; }
+    .coming { font-size: 0.9rem; font-style: italic; }
+
+    @media (min-width: 760px) {
+      .release {
+        grid-template-columns: 1fr 1.3fr;
+        gap: 3.5rem;
+      }
+      .release-right {
+        grid-template-columns: 1.3fr 1fr;
+      }
+      .release-right .release-cover {
+        order: 2;
+      }
+      .release-cover { max-width: none; }
+    }
   </style>
 </BaseLayout>

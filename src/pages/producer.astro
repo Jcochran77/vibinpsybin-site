@@ -1,52 +1,117 @@
 ---
+import { Image } from "astro:assets";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import twoGuitarists from "../assets/photos/two-guitarists.jpg";
 ---
 
 <BaseLayout title="Production — Joe Psybin">
-  <h1>Production</h1>
-  <p class="lead">
-    Joe also produces records for a small number of artists each year.
-    Nashville-based, remote-friendly, analog-leaning.
-  </p>
-
-  <section>
-    <h2>What I do</h2>
-    <ul>
-      <li>Full-production for singles and EPs (tracking, arrangement, mix, master prep)</li>
-      <li>Mixing — from stems, from scratch, or cleanup</li>
-      <li>Songwriting collaboration and pre-production</li>
-    </ul>
+  <section class="band page-hero">
+    <div class="wrap-narrow">
+      <p class="eyebrow">Studio Work</p>
+      <h1>Production</h1>
+      <p class="lead">
+        Joe also produces records for a small number of artists each year.<br/>
+        Nashville-based, remote-friendly, analog-leaning.
+      </p>
+    </div>
   </section>
 
-  <section>
-    <h2>Rates &amp; availability</h2>
-    <p class="muted">
-      Project-based. Reach out with what you&rsquo;re working on and I&rsquo;ll get back with a quote and timeline.
-    </p>
-    <p>
-      <a class="btn" href="/contact">Get in touch</a>
-    </p>
+  <section class="band">
+    <div class="wrap prod-grid">
+      <div class="prod-photo">
+        <Image
+          src={twoGuitarists}
+          alt="Joe working with another guitarist in the studio"
+          widths={[500, 800, 1100]}
+          sizes="(max-width: 760px) 90vw, 500px"
+          class="photo"
+        />
+      </div>
+      <div class="prod-body">
+        <h2>What I do</h2>
+        <ul class="services">
+          <li>
+            <strong>Full production</strong>
+            <span>Singles and EPs — tracking, arrangement, mix, master prep</span>
+          </li>
+          <li>
+            <strong>Mixing</strong>
+            <span>From stems, from scratch, or cleanup on existing sessions</span>
+          </li>
+          <li>
+            <strong>Songwriting &amp; pre-pro</strong>
+            <span>Collaboration on structure, lyrics, and arrangement before you track</span>
+          </li>
+        </ul>
+
+        <h2>Rates &amp; availability</h2>
+        <p class="muted">
+          Project-based. Reach out with what you&rsquo;re working on and I&rsquo;ll get back with a quote and timeline.
+        </p>
+        <div class="cta">
+          <a class="btn btn-solid" href="/contact">Get in touch</a>
+        </div>
+      </div>
+    </div>
   </section>
 
   <style>
+    .page-hero {
+      padding: 4rem 0 2rem;
+      text-align: center;
+    }
     .lead {
       font-size: 1.15rem;
       color: var(--fg);
       max-width: 42rem;
+      margin: 0.5rem auto 0;
+      line-height: 1.55;
     }
-    ul { padding-left: 1.25rem; }
-    ul li { margin: 0.35rem 0; }
-    .btn {
-      display: inline-block;
-      padding: 0.6rem 1.5rem;
-      border: 1px solid var(--accent);
-      color: var(--accent);
-      border-radius: 4px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      font-size: 0.9rem;
-      font-family: ui-sans-serif, system-ui, sans-serif;
+
+    .prod-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 3rem;
+      align-items: start;
     }
-    .btn:hover { background: var(--accent); color: var(--bg); text-decoration: none; }
+    .prod-photo .photo {
+      width: 100%;
+      height: auto;
+      border-radius: 3px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+    .services {
+      list-style: none;
+      padding: 0;
+      margin: 1rem 0 2.5rem;
+    }
+    .services li {
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--line-soft);
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+    .services li:last-child { border-bottom: none; }
+    .services strong {
+      font-family: var(--font-serif);
+      font-size: 1.15rem;
+      color: var(--fg);
+      font-weight: 400;
+    }
+    .services span {
+      color: var(--fg-muted);
+      font-size: 0.95rem;
+    }
+    .cta {
+      margin-top: 1.5rem;
+    }
+
+    @media (min-width: 760px) {
+      .prod-grid {
+        grid-template-columns: 1fr 1.1fr;
+        gap: 4rem;
+      }
+    }
   </style>
 </BaseLayout>
