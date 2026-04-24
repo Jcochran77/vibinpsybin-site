@@ -17,6 +17,7 @@ const nav = [
   { href: "/music", label: "Music" },
   { href: "/videos", label: "Videos" },
   { href: "/shows", label: "Shows" },
+  { href: "/subscribe", label: "Subscribe", emphasize: true },
   { href: "/producer", label: "Production" },
   { href: "/contact", label: "Contact" },
 ];
@@ -60,7 +61,7 @@ const isActive = (href: string) =>
           nav.map((item) => (
             <a
               href={item.href}
-              class:list={[{ active: isActive(item.href) }]}
+              class:list={[{ active: isActive(item.href), emphasize: item.emphasize }]}
             >
               {item.label}
             </a>
@@ -88,6 +89,7 @@ const isActive = (href: string) =>
         <div class="footer-mantra">
           <p>No tracking. No ads. No algorithm.</p>
           <p><em>Just the music.</em></p>
+          <p class="footer-cta"><a href="/subscribe">Get email updates →</a></p>
         </div>
       </div>
       <p class="copy">&copy; {new Date().getFullYear()} Vibin&rsquo; Psybin and the Sunlight Band &middot; Nashville, TN</p>
@@ -269,6 +271,17 @@ const isActive = (href: string) =>
         color: var(--accent);
         border-bottom-color: var(--accent);
       }
+      nav[aria-label="Primary"] a.emphasize {
+        color: var(--accent);
+        border: 1px solid var(--accent);
+        padding: 0.35rem 0.75rem;
+        border-radius: 2px;
+      }
+      nav[aria-label="Primary"] a.emphasize:hover {
+        background: var(--accent);
+        color: var(--bg);
+        border-color: var(--accent);
+      }
 
       /* Main */
       main {
@@ -415,6 +428,16 @@ const isActive = (href: string) =>
       .footer-mantra em {
         color: var(--accent-2);
         font-style: italic;
+      }
+      .footer-cta {
+        margin-top: 0.75rem !important;
+        font-size: 0.85rem;
+      }
+      .footer-cta a {
+        color: var(--accent);
+      }
+      .footer-cta a:hover {
+        color: var(--fg);
       }
       .copy {
         text-align: center;

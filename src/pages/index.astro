@@ -105,6 +105,32 @@ const eyebrowLabel = showEyebrow(nextShowDays);
     </section>
   )}
 
+  <!-- SIGNUP — promoted to right after Next Show, with rainbow top border -->
+  <section class="band signup-section">
+    <div class="wrap-narrow signup">
+      <p class="eyebrow">Stay close</p>
+      <h2>One email.<br/>Only when it matters.</h2>
+      <p class="muted">
+        New music. New videos. New shows. <em>That&rsquo;s it.</em>
+      </p>
+
+      <form id="email-signup" action="/api/subscribe" method="POST" class="form">
+        <label for="email" class="sr-only">Email address</label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          required
+          autocomplete="email"
+          placeholder="your@email.com"
+        />
+        <button type="submit" class="btn btn-solid">Sign me up</button>
+      </form>
+      <p class="form-msg" id="form-msg" aria-live="polite"></p>
+      <p class="more-link"><a href="/subscribe">More about the list →</a></p>
+    </div>
+  </section>
+
   <!-- LATEST RELEASE -->
   {latestRelease && (
     <section class="band release-section">
@@ -149,31 +175,6 @@ const eyebrowLabel = showEyebrow(nextShowDays);
       </div>
     </section>
   )}
-
-  <!-- SIGNUP -->
-  <section class="band signup-section">
-    <div class="wrap-narrow signup">
-      <p class="eyebrow">Stay in the loop</p>
-      <h2>One email. Only when it matters.</h2>
-      <p class="muted">
-        New shows, new songs, new videos. No spam, no algorithm, no daily noise.
-      </p>
-
-      <form id="email-signup" action="/api/subscribe" method="POST" class="form">
-        <label for="email" class="sr-only">Email address</label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          required
-          autocomplete="email"
-          placeholder="your@email.com"
-        />
-        <button type="submit" class="btn btn-solid">Sign up</button>
-      </form>
-      <p class="form-msg" id="form-msg" aria-live="polite"></p>
-    </div>
-  </section>
 
   <style>
     /* HERO */
@@ -461,13 +462,28 @@ const eyebrowLabel = showEyebrow(nextShowDays);
 
     /* SIGNUP */
     .signup-section {
-      background: var(--bg-alt);
+      background: linear-gradient(180deg, var(--bg-alt) 0%, var(--bg) 100%);
+      position: relative;
+    }
+    .signup-section::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--magenta), var(--violet), var(--electric));
     }
     .signup {
       text-align: center;
-      padding: 2rem 1.5rem;
+      padding: 3rem 1.5rem 2rem;
     }
-    .signup h2 { margin-top: 0.5rem; }
+    .signup h2 {
+      margin-top: 0.5rem;
+      font-size: clamp(1.8rem, 4vw, 2.75rem);
+    }
+    .signup .muted em {
+      color: var(--accent);
+      font-style: italic;
+    }
     .form {
       display: flex;
       gap: 0.5rem;
@@ -475,10 +491,17 @@ const eyebrowLabel = showEyebrow(nextShowDays);
       margin: 1.5rem auto 0;
       flex-wrap: wrap;
       justify-content: center;
+      padding: 1rem;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      box-shadow:
+        0 0 60px rgba(255,62,136,0.08),
+        0 0 30px rgba(78,205,255,0.06);
     }
     .form input {
       flex: 1 1 18rem;
-      padding: 0.85rem 1rem;
+      padding: 0.95rem 1rem;
       background: var(--bg);
       border: 1px solid var(--line);
       color: var(--fg);
@@ -489,10 +512,11 @@ const eyebrowLabel = showEyebrow(nextShowDays);
     .form input:focus {
       outline: none;
       border-color: var(--accent-2);
-      box-shadow: 0 0 0 3px rgba(78,205,196,0.15);
+      box-shadow: 0 0 0 3px rgba(78,205,255,0.18);
     }
     .form button {
       cursor: pointer;
+      padding: 0.95rem 1.5rem;
       border: 1.5px solid var(--accent);
     }
     .form-msg {
@@ -500,7 +524,18 @@ const eyebrowLabel = showEyebrow(nextShowDays);
       margin: 0.75rem auto 0;
       min-height: 1.2em;
       font-size: 0.9rem;
-      color: var(--turquoise);
+      color: var(--electric);
+    }
+    .more-link {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+    }
+    .more-link a {
+      color: var(--fg-muted);
+      letter-spacing: 0.05em;
+    }
+    .more-link a:hover {
+      color: var(--accent);
     }
     .sr-only {
       position: absolute;
