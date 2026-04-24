@@ -254,8 +254,11 @@ const eyebrowLabel = showEyebrow(nextShowDays);
       font-style: italic;
       font-family: var(--font-serif);
       letter-spacing: -0.02em;
-      transform: translateX(5%) rotate(-1.5deg);
+      transform: rotate(-1.5deg);
+      transform-origin: center;
       text-shadow: 0 0 50px rgba(255,179,71,0.45);
+      display: inline-block;
+      align-self: center;
     }
     .hero-title .line-3 {
       background: linear-gradient(90deg, var(--electric) 0%, var(--violet) 100%);
