@@ -170,12 +170,12 @@ async function fetchArtistAlbums(
   displayName: string,
   token: string,
 ): Promise<SpotifyAlbum[]> {
-  const qs = new URLSearchParams({
-    include_groups: "album,single",
-    limit: "50",
-    market: MARKET,
-  });
-  let url: string | null = `/artists/${artistId}/albums?${qs.toString()}`;
+  // Don't use URLSearchParams here: Spotify rejects URL-encoded commas in
+  // include_groups (%2C). Build the query string manually with a raw comma.
+  // Spotify now caps limit at 10 for new/unverified apps (used to be 50).
+  // Pagination handles the rest via page.next.
+  let url: string | null =
+    `/artists/${artistId}/albums?include_groups=album,single&limit=10&market=${encodeURIComponent(MARKET)}`;
   const out: SpotifyAlbum[] = [];
   // Paginate just in case — usually one page is plenty.
   while (url) {
@@ -200,8 +200,9 @@ async function fetchAlbumTracks(
   albumId: string,
   token: string,
 ): Promise<string[]> {
-  const qs = new URLSearchParams({ limit: "50", market: MARKET });
-  let url: string | null = `/albums/${albumId}/tracks?${qs.toString()}`;
+  // Same limit-10 cap as albums endpoint.
+  let url: string | null =
+    `/albums/${albumId}/tracks?limit=10&market=${encodeURIComponent(MARKET)}`;
   const names: { name: string; track: number; disc: number }[] = [];
   while (url) {
     const page = await spotifyGet<SpotifyTracksResponse>(url, token);
