@@ -1,5 +1,5 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
+import { defineConfig, sharpImageService } from 'astro/config';
 import { loadEnv } from 'vite';
 
 const env = loadEnv(process.env.NODE_ENV ?? 'development', process.cwd(), '');
@@ -12,4 +12,10 @@ for (const [k, v] of Object.entries(env)) {
 export default defineConfig({
   site: 'https://vibinpsybin.band',
   trailingSlash: 'never',
+  image: {
+    // Force Sharp at build time so static output gets pre-generated
+    // webp files (instead of dynamic /_image?... URLs that 404 on a
+    // no-server Cloudflare Pages deploy).
+    service: sharpImageService(),
+  },
 });

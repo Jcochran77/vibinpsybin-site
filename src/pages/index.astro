@@ -59,11 +59,11 @@ const eyebrowLabel = showEyebrow(nextShowDays);
       <Image src={circleLogo} alt="" widths={[140, 220]} sizes="140px" class="hero-mark" />
       <h1 class="hero-title">
         <span class="line-1">Psychedelic</span>
-        <span class="line-2">Cosmic</span>
-        <span class="line-3">Country</span>
+        <span class="line-2">Blues</span>
+        <span class="line-3">&amp; Indie Rock</span>
       </h1>
       <p class="hero-sub">
-        Vibin&rsquo; Psybin &amp; the Sunlight Band &middot; Nashville, TN
+        <span class="sub-dot">◉</span> Vibin&rsquo; Psybin &amp; the Sunlight Band <span class="sub-dot">◉</span> Nashville, TN <span class="sub-dot">◉</span>
       </p>
       <div class="hero-ctas">
         <a class="btn btn-solid" href="/music">Listen</a>
@@ -181,13 +181,19 @@ const eyebrowLabel = showEyebrow(nextShowDays);
       height: 100%;
       object-fit: cover;
       object-position: center 35%;
+      /* Duotone-ish psychedelic treatment */
+      filter: saturate(1.15) contrast(1.08) hue-rotate(-8deg);
+      mix-blend-mode: luminosity;
+      opacity: 0.85;
     }
     .hero-overlay {
       position: absolute;
       inset: 0;
       background:
-        radial-gradient(ellipse at center, rgba(11,9,18,0.35) 0%, rgba(11,9,18,0.85) 80%),
-        linear-gradient(180deg, rgba(11,9,18,0.4) 0%, rgba(11,9,18,0.95) 100%);
+        radial-gradient(ellipse at 25% 40%, rgba(255,62,136,0.22) 0%, transparent 55%),
+        radial-gradient(ellipse at 75% 60%, rgba(78,205,255,0.18) 0%, transparent 55%),
+        radial-gradient(ellipse at center, rgba(10,8,20,0.4) 0%, rgba(10,8,20,0.92) 85%),
+        linear-gradient(180deg, rgba(10,8,20,0.5) 0%, rgba(10,8,20,0.98) 100%);
     }
     .hero-content {
       position: relative;
@@ -204,25 +210,58 @@ const eyebrowLabel = showEyebrow(nextShowDays);
     }
     .hero-title {
       font-family: var(--font-display);
-      font-size: clamp(3rem, 11vw, 8rem);
-      line-height: 0.95;
-      letter-spacing: 0.02em;
+      font-size: clamp(3.25rem, 13vw, 9rem);
+      line-height: 0.9;
+      letter-spacing: 0.015em;
       margin: 0.5rem 0;
       display: flex;
       flex-direction: column;
-      gap: 0.1em;
+      gap: 0.05em;
+      text-shadow:
+        0 0 40px rgba(255,62,136,0.25),
+        0 0 80px rgba(139,92,255,0.15);
     }
-    .hero-title .line-1 { color: var(--fg); }
-    .hero-title .line-2 { color: var(--amber); font-style: italic; font-family: var(--font-serif); letter-spacing: -0.01em; }
-    .hero-title .line-3 { color: var(--turquoise); }
+    .hero-title .line-1 {
+      color: var(--fg);
+      background: linear-gradient(180deg, var(--fg) 0%, var(--magenta) 130%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-title .line-2 {
+      color: var(--amber);
+      font-style: italic;
+      font-family: var(--font-serif);
+      letter-spacing: -0.02em;
+      transform: translateX(5%) rotate(-1.5deg);
+      text-shadow: 0 0 50px rgba(255,179,71,0.45);
+    }
+    .hero-title .line-3 {
+      background: linear-gradient(90deg, var(--electric) 0%, var(--violet) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: 0.85em;
+      letter-spacing: 0.02em;
+    }
 
     .hero-sub {
       font-family: var(--font-sans);
-      font-size: clamp(0.85rem, 1.8vw, 1.05rem);
-      letter-spacing: 0.2em;
+      font-size: clamp(0.78rem, 1.6vw, 0.95rem);
+      letter-spacing: 0.22em;
       text-transform: uppercase;
       color: var(--fg-muted);
-      margin: 1.5rem 0 2rem;
+      margin: 2rem 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .sub-dot {
+      color: var(--magenta);
+      font-size: 0.6em;
+      opacity: 0.8;
     }
     .hero-ctas {
       display: flex;
@@ -259,14 +298,25 @@ const eyebrowLabel = showEyebrow(nextShowDays);
       border-radius: 4px;
       background: var(--bg-alt);
       position: relative;
+      overflow: hidden;
     }
     .next-show::before {
       content: "";
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at 85% 30%, rgba(78,205,196,0.08), transparent 60%);
+      background:
+        radial-gradient(circle at 85% 30%, rgba(255,62,136,0.1), transparent 55%),
+        radial-gradient(circle at 15% 80%, rgba(78,205,255,0.08), transparent 55%);
       pointer-events: none;
       border-radius: 4px;
+    }
+    .next-show::after {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--magenta), var(--violet), var(--electric));
+      opacity: 0.8;
     }
     .next-show > * { position: relative; z-index: 1; }
 
@@ -335,8 +385,17 @@ const eyebrowLabel = showEyebrow(nextShowDays);
       display: block;
       border-radius: 3px;
       box-shadow:
-        0 0 60px rgba(78,205,196,0.12),
-        0 20px 40px rgba(0,0,0,0.5);
+        0 0 80px rgba(255,62,136,0.18),
+        0 0 40px rgba(139,92,255,0.15),
+        0 20px 40px rgba(0,0,0,0.6);
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+    }
+    .release-art:hover .release-art-img {
+      transform: rotate(-1deg) scale(1.02);
+      box-shadow:
+        0 0 100px rgba(255,62,136,0.28),
+        0 0 60px rgba(139,92,255,0.2),
+        0 25px 50px rgba(0,0,0,0.6);
     }
     .release-info h2 { margin-top: 0.5rem; }
     .release-notes {

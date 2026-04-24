@@ -10,7 +10,7 @@ export interface Props {
 
 const {
   title = "Vibin' Psybin and the Sunlight Band",
-  description = "Nashville-based psychedelic cosmic country. Direct from the band to you — no social media required.",
+  description = "Nashville psychedelic blues and indie rock. Direct from the band to you — no social media required.",
 } = Astro.props;
 
 const nav = [
@@ -45,6 +45,11 @@ const isActive = (href: string) =>
     <meta name="theme-color" content="#0b0912" />
   </head>
   <body>
+    <div class="aurora" aria-hidden="true">
+      <div class="aurora-blob blob-1"></div>
+      <div class="aurora-blob blob-2"></div>
+      <div class="aurora-blob blob-3"></div>
+    </div>
     <div class="grain" aria-hidden="true"></div>
 
     <header class="site-header">
@@ -92,28 +97,32 @@ const isActive = (href: string) =>
     <style is:global>
       :root {
         /* Deep nighttime base */
-        --bg:        #0b0912;
-        --bg-alt:    #15101f;
-        --bg-elev:   #1d1630;
+        --bg:        #0a0814;
+        --bg-alt:    #130e22;
+        --bg-elev:   #1c1533;
 
         /* Warm cream text */
-        --fg:        #f5efe4;
-        --fg-muted:  #b8ad9a;
-        --fg-dim:    #7a715f;
+        --fg:        #f7f1e6;
+        --fg-muted:  #b9abc6;
+        --fg-dim:    #7a7088;
 
-        /* Hippie-cowboy palette */
-        --turquoise: #4ecdc4;
-        --turquoise-dim: #2a8f87;
-        --amber:     #f2b544;
-        --amber-dim: #b07a24;
-        --peach:     #f28b6b;
-        --lavender:  #a88fc8;
+        /* Psychedelic palette — blues/indie/psych */
+        --magenta:   #ff3e88;
+        --magenta-dim: #b8185c;
+        --violet:    #8b5cff;
+        --violet-dim: #5d3dbd;
+        --electric:  #4ecdff;
+        --electric-dim: #1a8ec4;
+        --amber:     #ffb347;
+        --amber-dim: #c88020;
+        --acid:      #c8ff3e;
 
-        --accent:    var(--amber);
-        --accent-2:  var(--turquoise);
+        --accent:    var(--magenta);
+        --accent-2:  var(--electric);
+        --accent-3:  var(--amber);
 
-        --line:      #2d2340;
-        --line-soft: #1e1830;
+        --line:      #2a2045;
+        --line-soft: #1a1330;
 
         /* Fonts */
         --font-display: "Unica One", "Bebas Neue", Impact, sans-serif;
@@ -144,23 +153,73 @@ const isActive = (href: string) =>
         overflow-x: hidden;
       }
 
-      /* Subtle film grain — adds texture without distraction */
+      /* Aurora — drifting color blobs in the background */
+      .aurora {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        overflow: hidden;
+        opacity: 0.55;
+      }
+      .aurora-blob {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(90px);
+        mix-blend-mode: screen;
+        will-change: transform;
+      }
+      .blob-1 {
+        width: 55vw; height: 55vw;
+        top: -15%; left: -10%;
+        background: radial-gradient(circle, var(--magenta) 0%, transparent 65%);
+        animation: drift1 28s ease-in-out infinite;
+      }
+      .blob-2 {
+        width: 45vw; height: 45vw;
+        top: 20%; right: -12%;
+        background: radial-gradient(circle, var(--electric) 0%, transparent 65%);
+        animation: drift2 32s ease-in-out infinite;
+      }
+      .blob-3 {
+        width: 50vw; height: 50vw;
+        bottom: -20%; left: 25%;
+        background: radial-gradient(circle, var(--violet) 0%, transparent 65%);
+        animation: drift3 36s ease-in-out infinite;
+      }
+      @keyframes drift1 {
+        0%,100% { transform: translate(0,0) scale(1); }
+        50% { transform: translate(12vw, 8vh) scale(1.15); }
+      }
+      @keyframes drift2 {
+        0%,100% { transform: translate(0,0) scale(1); }
+        50% { transform: translate(-10vw, 15vh) scale(0.9); }
+      }
+      @keyframes drift3 {
+        0%,100% { transform: translate(0,0) scale(1); }
+        50% { transform: translate(-8vw, -12vh) scale(1.2); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .aurora-blob { animation: none; }
+      }
+
+      /* Subtle film grain — adds texture */
       .grain {
         position: fixed;
         inset: 0;
         pointer-events: none;
         z-index: 1;
-        opacity: 0.06;
+        opacity: 0.08;
         background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
         mix-blend-mode: overlay;
       }
 
       a {
-        color: var(--accent);
+        color: var(--accent-2);
         text-decoration: none;
         transition: color 0.15s ease;
       }
-      a:hover { color: var(--fg); }
+      a:hover { color: var(--accent); }
 
       /* Header */
       .site-header {
