@@ -17,9 +17,9 @@ const nav = [
   { href: "/music", label: "Music" },
   { href: "/videos", label: "Videos" },
   { href: "/shows", label: "Shows" },
-  { href: "/subscribe", label: "Subscribe", emphasize: true },
   { href: "/producer", label: "Production" },
   { href: "/contact", label: "Contact" },
+  { href: "/subscribe", label: "Subscribe", emphasize: true },
 ];
 
 const path = Astro.url.pathname;
@@ -276,6 +276,7 @@ const isActive = (href: string) =>
         border: 1px solid var(--accent);
         padding: 0.35rem 0.75rem;
         border-radius: 2px;
+        margin-left: 0.5rem;
       }
       nav[aria-label="Primary"] a.emphasize:hover {
         background: var(--accent);
