@@ -1,8 +1,38 @@
 [
   {
-    "id": "placeholder",
-    "title": "Music videos coming soon",
-    "youtubeId": null,
-    "notes": "Replace this with real YouTube IDs once videos are uploaded."
+    "id": "token-live-studio",
+    "title": "Token — Live Studio",
+    "youtubeId": "Lq30OS4ymXo",
+    "publishedAt": "2024-03-13"
+  },
+  {
+    "id": "keep-it-kool-live-studio",
+    "title": "Keep it Kool — Live Studio",
+    "youtubeId": "G3tusmZCX1Q",
+    "publishedAt": "2024-03-13"
+  },
+  {
+    "id": "king-of-tennessee-live-studio",
+    "title": "King of Tennessee — Live Studio",
+    "youtubeId": "CW-Kb_Nwlw0",
+    "publishedAt": "2024-03-13"
+  },
+  {
+    "id": "do-no-wrong-live-studio",
+    "title": "Do No Wrong — Live Studio",
+    "youtubeId": "o18stlGF-ZA",
+    "publishedAt": "2023-10-02"
+  },
+  {
+    "id": "i-know-a-girl-live-studio",
+    "title": "I Know A Girl — Live Studio",
+    "youtubeId": "x9fAS7tbryI",
+    "publishedAt": "2023-09-25"
+  },
+  {
+    "id": "vibin-psybins-kitchen",
+    "title": "Vibin' Psybin's Kitchen",
+    "youtubeId": "BStdDudyx08",
+    "publishedAt": "2023-01-30"
   }
 ]
