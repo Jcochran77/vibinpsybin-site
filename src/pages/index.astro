@@ -123,9 +123,6 @@ const eyebrowLabel = showEyebrow(nextShowDays);
             <p class="muted">{latestRelease.artist} &middot; {latestRelease.year}</p>
             {latestRelease.notes && <p class="release-notes">{latestRelease.notes}</p>}
             <div class="release-ctas">
-              {latestRelease.appleMusicUrl && (
-                <a class="btn" href={latestRelease.appleMusicUrl}>Apple Music</a>
-              )}
               <a class="btn btn-solid" href="/music">All releases</a>
             </div>
           </div>

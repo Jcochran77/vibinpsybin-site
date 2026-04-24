@@ -54,7 +54,7 @@ const isActive = (href: string) =>
 
     <header class="site-header">
       <a href="/" class="brand" aria-label="Vibin' Psybin and the Sunlight Band — home">
-        <Image src={scriptLogo} alt="Vibin' Psybin and the Sunlight Band" widths={[240, 360, 480]} sizes="(max-width: 720px) 200px, 280px" loading="eager" class="brand-logo" />
+        <Image src={scriptLogo} alt="Vibin' Psybin and the Sunlight Band" widths={[140, 180, 280, 360]} sizes="(max-width: 720px) 140px, 180px" loading="eager" class="brand-logo" />
       </a>
       <nav aria-label="Primary">
         {
@@ -225,10 +225,10 @@ const isActive = (href: string) =>
       .site-header {
         position: relative;
         z-index: 10;
-        padding: 1.5rem 2rem;
+        padding: 1rem 1.5rem;
         display: flex;
         flex-direction: column;
-        gap: 1.25rem;
+        gap: 1rem;
         align-items: center;
         text-align: center;
       }
@@ -238,7 +238,7 @@ const isActive = (href: string) =>
         line-height: 0;
       }
       .brand-logo {
-        width: 240px;
+        width: 140px;
         height: auto;
         filter: invert(1) brightness(0.98);
       }
@@ -428,10 +428,11 @@ const isActive = (href: string) =>
         .site-header {
           flex-direction: row;
           justify-content: space-between;
-          padding: 1.75rem 3rem;
+          align-items: center;
+          padding: 1.25rem 2.5rem;
           text-align: left;
         }
-        .brand-logo { width: 280px; }
+        .brand-logo { width: 180px; }
         nav[aria-label="Primary"] {
           justify-content: flex-end;
         }

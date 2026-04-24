@@ -60,8 +60,8 @@ function typeLabel(t: string) {
                 )}
                 {r.notes && <p class="notes">{r.notes}</p>}
                 <div class="links">
-                  {r.appleMusicUrl && <a class="btn" href={r.appleMusicUrl}>Apple Music</a>}
-                  {!r.appleMusicUrl && <span class="muted coming">Streaming links coming soon</span>}
+                  {/* TODO: render spotifyUrl / bandcampUrl once backend-dev's Spotify scrape populates them on the release records. */}
+                  <span class="muted coming">Streaming links coming soon</span>
                 </div>
               </div>
             </article>
