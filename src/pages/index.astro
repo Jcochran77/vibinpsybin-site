@@ -4,7 +4,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import { fetchShows } from "../lib/bandsintown";
 import { fetchSpotifyReleases } from "../lib/spotify";
 import heroPhoto from "../assets/photos/hero-turquoise-suit.jpg";
-import circleLogo from "../assets/logos/vpsb-circle-logo.png";
+import scriptLogo from "../assets/logos/vpsb-script-logo.png";
 
 const [upcomingShows, releases] = await Promise.all([
   fetchShows("upcoming"),
@@ -58,7 +58,7 @@ const eyebrowLabel = showEyebrow(nextShowDays);
     </div>
 
     <div class="hero-content wrap">
-      <Image src={circleLogo} alt="" widths={[140, 220]} sizes="140px" class="hero-mark" />
+      <Image src={scriptLogo} alt="Vibin' Psybin and the Sunlight Band" widths={[280, 360, 540, 720]} sizes="(max-width: 760px) 280px, 360px" class="hero-mark" />
       <h1 class="hero-title">
         <span class="line-1">Psychedelic</span>
         <span class="line-2">Blues</span>
@@ -217,12 +217,17 @@ const eyebrowLabel = showEyebrow(nextShowDays);
       padding: 4rem 1.5rem;
     }
     .hero-mark {
-      width: 120px;
+      width: 280px;
       height: auto;
       filter: invert(1) brightness(0.95);
       opacity: 0.9;
       margin: 0 auto 1.5rem;
       display: block;
+    }
+    @media (min-width: 760px) {
+      .hero-mark {
+        width: 360px;
+      }
     }
     .hero-title {
       font-family: var(--font-display);
