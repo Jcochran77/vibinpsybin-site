@@ -1,16 +1,10 @@
 ---
-import { Image } from "astro:assets";
 import BaseLayout from "../layouts/BaseLayout.astro";
-import releases from "../data/releases.json";
-import hippieCowboyArt from "../assets/covers/hippie-cowboy.jpg";
-import singleCover from "../assets/covers/vpsb-single-2.jpg";
+import { fetchSpotifyReleases } from "../lib/spotify";
 
-// Map release id → cover art asset
-const coverMap: Record<string, ImageMetadata> = {
-  "hippie-cowboy": hippieCowboyArt,
-  // Fallback for solo singles without dedicated art — use VPSB single cover as placeholder
-  "live-fast-ep": singleCover,
-};
+// Pulled at build time. Falls back to src/data/releases.json when
+// SPOTIFY_CLIENT_ID / SPOTIFY_CLIENT_SECRET are missing or the API errors.
+const releases = await fetchSpotifyReleases();
 
 function typeLabel(t: string) {
   return t === "ep" ? "EP" : t.charAt(0).toUpperCase() + t.slice(1);
@@ -31,42 +25,45 @@ function typeLabel(t: string) {
   <section class="band releases">
     <div class="wrap">
       <div class="release-list">
-        {releases.map((r, idx) => {
-          const cover = coverMap[r.id];
-          return (
-            <article class={`release release-${idx % 2 === 0 ? "left" : "right"}`}>
-              <div class="release-cover">
-                {cover ? (
-                  <Image
-                    src={cover}
-                    alt={`${r.title} cover art`}
-                    widths={[300, 500, 700]}
-                    sizes="(max-width: 760px) 90vw, 400px"
-                  />
-                ) : (
-                  <div class="cover-placeholder">
-                    <span class="cover-title">{r.title}</span>
-                  </div>
-                )}
-              </div>
-              <div class="release-body">
-                <p class="eyebrow">{typeLabel(r.type)} &middot; {r.year}</p>
-                <h2>{r.title}</h2>
-                <p class="artist">{r.artist}</p>
-                {r.tracks && (
-                  <ol class="tracks">
-                    {r.tracks.map((t) => <li>{t}</li>)}
-                  </ol>
-                )}
-                {r.notes && <p class="notes">{r.notes}</p>}
-                <div class="links">
-                  {/* TODO: render spotifyUrl / bandcampUrl once backend-dev's Spotify scrape populates them on the release records. */}
-                  <span class="muted coming">Streaming links coming soon</span>
+        {releases.map((r, idx) => (
+          <article class={`release release-${idx % 2 === 0 ? "left" : "right"}`}>
+            <div class="release-cover">
+              {r.coverUrl ? (
+                <img
+                  src={r.coverUrl}
+                  alt={`${r.title} cover art`}
+                  loading="lazy"
+                  width="640"
+                  height="640"
+                />
+              ) : (
+                <div class="cover-placeholder">
+                  <span class="cover-title">{r.title}</span>
                 </div>
+              )}
+            </div>
+            <div class="release-body">
+              <p class="eyebrow">{typeLabel(r.type)} &middot; {r.year}</p>
+              <h2>{r.title}</h2>
+              <p class="artist">{r.artist}</p>
+              {r.trackNames.length > 0 && (
+                <ol class="tracks">
+                  {r.trackNames.map((t) => <li>{t}</li>)}
+                </ol>
+              )}
+              {r.notes && <p class="notes">{r.notes}</p>}
+              <div class="links">
+                {r.spotifyUrl ? (
+                  <a class="btn btn-solid" href={r.spotifyUrl} target="_blank" rel="noopener">
+                    Listen on Spotify
+                  </a>
+                ) : (
+                  <span class="muted coming">Streaming links coming soon</span>
+                )}
               </div>
-            </article>
-          );
-        })}
+            </div>
+          </article>
+        ))}
       </div>
     </div>
   </section>
@@ -105,6 +102,7 @@ function typeLabel(t: string) {
       border-radius: 3px;
       box-shadow: 0 15px 35px rgba(0,0,0,0.5);
       transition: transform 0.4s ease;
+      display: block;
     }
     .release:hover .release-cover img {
       transform: scale(1.02);

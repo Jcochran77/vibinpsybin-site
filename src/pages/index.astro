@@ -2,12 +2,14 @@
 import { Image } from "astro:assets";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { fetchShows } from "../lib/bandsintown";
-import releases from "../data/releases.json";
+import { fetchSpotifyReleases } from "../lib/spotify";
 import heroPhoto from "../assets/photos/hero-turquoise-suit.jpg";
 import circleLogo from "../assets/logos/vpsb-circle-logo.png";
-import hippieCowboyArt from "../assets/covers/hippie-cowboy.jpg";
 
-const upcomingShows = await fetchShows("upcoming");
+const [upcomingShows, releases] = await Promise.all([
+  fetchShows("upcoming"),
+  fetchSpotifyReleases(),
+]);
 const nextShow = upcomingShows[0];
 const latestRelease = releases[0];
 
@@ -109,13 +111,27 @@ const eyebrowLabel = showEyebrow(nextShowDays);
       <div class="wrap">
         <div class="release-feature">
           <div class="release-art">
-            <Image
-              src={hippieCowboyArt}
-              alt={`${latestRelease.title} album art`}
-              widths={[400, 600, 900]}
-              sizes="(max-width: 760px) 90vw, 500px"
-              class="release-art-img"
-            />
+            {latestRelease.coverUrl ? (
+              <a
+                href={latestRelease.spotifyUrl ?? "/music"}
+                target={latestRelease.spotifyUrl ? "_blank" : undefined}
+                rel={latestRelease.spotifyUrl ? "noopener" : undefined}
+                class="release-art-link"
+              >
+                <img
+                  src={latestRelease.coverUrl}
+                  alt={`${latestRelease.title} album art`}
+                  loading="eager"
+                  width="640"
+                  height="640"
+                  class="release-art-img"
+                />
+              </a>
+            ) : (
+              <div class="release-art-placeholder">
+                <span>{latestRelease.title}</span>
+              </div>
+            )}
           </div>
           <div class="release-info">
             <p class="eyebrow">Latest release</p>
@@ -123,7 +139,10 @@ const eyebrowLabel = showEyebrow(nextShowDays);
             <p class="muted">{latestRelease.artist} &middot; {latestRelease.year}</p>
             {latestRelease.notes && <p class="release-notes">{latestRelease.notes}</p>}
             <div class="release-ctas">
-              <a class="btn btn-solid" href="/music">All releases</a>
+              {latestRelease.spotifyUrl && (
+                <a class="btn btn-solid" href={latestRelease.spotifyUrl} target="_blank" rel="noopener">Listen on Spotify</a>
+              )}
+              <a class="btn" href="/music">All releases</a>
             </div>
           </div>
         </div>
@@ -374,6 +393,11 @@ const eyebrowLabel = showEyebrow(nextShowDays);
     .release-art {
       position: relative;
     }
+    .release-art-link {
+      display: block;
+      max-width: 500px;
+      margin: 0 auto;
+    }
     .release-art-img {
       width: 100%;
       height: auto;
@@ -386,6 +410,20 @@ const eyebrowLabel = showEyebrow(nextShowDays);
         0 0 40px rgba(139,92,255,0.15),
         0 20px 40px rgba(0,0,0,0.6);
       transition: transform 0.4s ease, box-shadow 0.4s ease;
+    }
+    .release-art-placeholder {
+      aspect-ratio: 1 / 1;
+      max-width: 500px;
+      margin: 0 auto;
+      background: linear-gradient(135deg, var(--bg-alt) 0%, var(--bg-elev) 100%);
+      border: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-serif);
+      color: var(--fg-muted);
+      padding: 1.5rem;
+      text-align: center;
     }
     .release-art:hover .release-art-img {
       transform: rotate(-1deg) scale(1.02);
