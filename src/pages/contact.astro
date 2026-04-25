@@ -37,6 +37,9 @@ const initialKind = re ? "song-feedback" : "hello";
         <p class="photo-caption">
           🎸 Joe, in his backyard in Nashville
         </p>
+        <p class="production-link">
+          Looking to record? <a href="/producer">Production work →</a>
+        </p>
       </div>
 
       <form id="contact-form" action="/api/contact" method="POST" class="form">
@@ -115,6 +118,20 @@ const initialKind = re ? "song-feedback" : "hello";
       font-size: 0.9rem;
       color: var(--fg-muted);
       font-style: italic;
+    }
+    .production-link {
+      margin: 1.25rem 0 0;
+      font-size: 0.9rem;
+      color: var(--fg-dim);
+    }
+    .production-link a {
+      color: var(--fg-muted);
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 1px;
+    }
+    .production-link a:hover {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
     }
 
     .form {
