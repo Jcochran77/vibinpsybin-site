@@ -31,6 +31,26 @@ const ARTIST_IDS: { id: string; displayName: string }[] = [
   { id: "16AgfIKYaZe0mmiAHuzVta", displayName: "Vibin' Psybin and the Sunlight Band" },
 ];
 
+// Pre-album / pre-EP singles whose tracks were later included on a larger
+// release. Hidden from /music to keep the discography page clean — listeners
+// see the canonical (largest) release for any given track. The single still
+// exists on streaming services, just not surfaced on our site.
+//
+// To un-hide a release, remove its ID from this list.
+// To hide a new release, add the Spotify album ID with a comment explaining
+// which larger release supersedes it.
+const HIDDEN_ALBUM_IDS: ReadonlySet<string> = new Set([
+  "74CfTR822eh6VGiJyccNct", // Live Fast/Headlights (2022-08-19) — rolled into Live Fast EP
+  "2umhMZ61vkt96y2yD1dsaA", // A Million Miles/Love Song #2 (2022-10-17) — rolled into Live Fast EP
+  "24fIqXw9dOn6P2zEBFskbV", // Do No Wrong / I Know A Girl (2023-07-28) — rolled into Hippie Cowboy
+  "7snksh4HsQhprvFB8cPi9s", // King of Tennessee (2024-01-12) — rolled into Hippie Cowboy
+  "5eocqaLyIyfEsou3RR3S1e", // Good Time Girls (2024-04-12) — rolled into Hippie Cowboy
+  "5HmfzolN3eqSUB9wLodgFb", // Because You Said So (2024-05-24) — rolled into Hippie Cowboy
+  "2cSlJc8Fz5zdIY0Im5rDjo", // Songbird (2024-07-19) — rolled into Hippie Cowboy
+  "7zlkcsMJBLcCx97tPRr8YW", // Po-Dunk Baby (2025-05-23) — rolled into To The Wind
+  "4pcZ5EAZ3jqgMzsf0rRXjX", // Let Me Loose (2025-06-27) — rolled into To The Wind
+]);
+
 const API_BASE = "https://api.spotify.com/v1";
 const TOKEN_URL = "https://accounts.spotify.com/api/token";
 const MARKET = "US";
@@ -440,7 +460,19 @@ async function fetchSpotifyReleasesUncached(): Promise<NormalizedRelease[]> {
     );
 
     const deduped = dedupe(withTracks);
-    const sorted = sortNewestFirst(deduped);
+
+    // Hide pre-album / pre-EP singles whose tracks are already on a larger
+    // release (see HIDDEN_ALBUM_IDS at the top of this file). Logged for
+    // build-time visibility so we know what got filtered.
+    const visible = deduped.filter((r) => {
+      if (HIDDEN_ALBUM_IDS.has(r.id)) {
+        console.log(`[spotify] hiding pre-release single from /music: ${r.title} (${r.id})`);
+        return false;
+      }
+      return true;
+    });
+
+    const sorted = sortNewestFirst(visible);
     if (sorted.length === 0) {
       console.warn(
         "[spotify] returned zero releases after dedupe; falling back to releases.json",
