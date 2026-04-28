@@ -1,0 +1,3 @@
+{
+  "_comment": "Per-release overrides keyed by Spotify album id. Shape: { '<spotifyAlbumId>': { 'bandcampUrl'?: string } }. Joe will populate as Bandcamp uploads catch up. Example: \"372PbPefzKQ2XOEO5miRJy\": { \"bandcampUrl\": \"https://vibinpsybin.bandcamp.com/album/the-ride\" }"
+}

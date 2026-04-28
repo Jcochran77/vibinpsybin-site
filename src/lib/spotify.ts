@@ -15,6 +15,15 @@
 // couple of deploys.
 
 import fallbackReleases from "../data/releases.json";
+import releaseOverrides from "../data/release-overrides.json";
+import {
+  fetchPlatformLinks,
+  getCachedPlatformLinks,
+  flushPlatformLinkCache,
+  emptyPlatformLinks,
+  sleep,
+  type PlatformLinks,
+} from "./songlink";
 
 // Artist IDs confirmed by Joe.
 const ARTIST_IDS: { id: string; displayName: string }[] = [
@@ -39,6 +48,32 @@ export interface NormalizedRelease {
   trackNames: string[];
   releaseDate: string; // YYYY-MM-DD or YYYY-MM or YYYY (Spotify varies by precision)
   notes?: string;
+  /**
+   * Resolved streaming-platform URLs from Odesli/song.link. May be null when
+   * the request failed (Odesli down, timeout, etc.) — UI must fall back to
+   * just the Spotify button in that case.
+   */
+  platformLinks: PlatformLinks | null;
+  /**
+   * Bandcamp URL pulled from src/data/release-overrides.json. Optional; null
+   * when the release isn't on Bandcamp yet (Joe is still uploading the
+   * catalog).
+   */
+  bandcampUrl: string | null;
+}
+
+// --- Per-release overrides (Bandcamp etc.) ---
+
+interface ReleaseOverrideEntry {
+  bandcampUrl?: string;
+}
+
+function getOverride(albumId: string): ReleaseOverrideEntry | null {
+  // The JSON file may include a leading `_comment` field for documentation.
+  // Skip non-object values defensively.
+  const raw = (releaseOverrides as Record<string, unknown>)[albumId];
+  if (!raw || typeof raw !== "object") return null;
+  return raw as ReleaseOverrideEntry;
 }
 
 // --- Spotify response types (partial) ---
@@ -256,6 +291,7 @@ function normalize(
   artistDisplayName: string,
   trackNames: string[],
 ): NormalizedRelease {
+  const override = getOverride(album.id);
   return {
     id: album.id,
     title: album.name,
@@ -266,6 +302,8 @@ function normalize(
     spotifyUrl: album.external_urls?.spotify ?? null,
     trackNames,
     releaseDate: album.release_date,
+    platformLinks: null, // populated after-the-fact in fetchSpotifyReleases
+    bandcampUrl: override?.bandcampUrl ?? null,
   };
 }
 
@@ -283,20 +321,25 @@ interface FallbackReleaseShape {
 
 function fallbackToNormalized(): NormalizedRelease[] {
   const list = fallbackReleases as FallbackReleaseShape[];
-  return list.map((r) => ({
-    id: r.id,
-    title: r.title,
-    artist: r.artist,
-    year: r.year,
-    type: (["album", "single", "ep", "compilation"].includes(r.type)
-      ? r.type
-      : "single") as ReleaseType,
-    coverUrl: null,
-    spotifyUrl: null,
-    trackNames: r.tracks ?? [],
-    releaseDate: `${r.year}-01-01`,
-    notes: r.notes,
-  }));
+  return list.map((r) => {
+    const override = getOverride(r.id);
+    return {
+      id: r.id,
+      title: r.title,
+      artist: r.artist,
+      year: r.year,
+      type: (["album", "single", "ep", "compilation"].includes(r.type)
+        ? r.type
+        : "single") as ReleaseType,
+      coverUrl: null,
+      spotifyUrl: null,
+      trackNames: r.tracks ?? [],
+      releaseDate: `${r.year}-01-01`,
+      notes: r.notes,
+      platformLinks: null,
+      bandcampUrl: override?.bandcampUrl ?? null,
+    };
+  });
 }
 
 // --- Dedupe & sort ---
@@ -339,12 +382,26 @@ function sortNewestFirst(releases: NormalizedRelease[]): NormalizedRelease[] {
 
 // --- Public API ---
 
+// Module-scoped cache (lives only for the duration of one build). Astro
+// renders music.astro and index.astro independently, but in the same Node
+// process — cache the in-flight Promise so we don't double-fetch (and
+// double-rate-limit) Odesli.
+let cachedReleasesPromise: Promise<NormalizedRelease[]> | null = null;
+
 /**
  * Fetch normalized releases from Spotify for both artist profiles, merge,
  * dedupe, and sort newest-first. Falls back to the static releases.json if
  * credentials are missing or any API call fails.
+ *
+ * Build-time cached — safe to call from multiple pages.
  */
 export async function fetchSpotifyReleases(): Promise<NormalizedRelease[]> {
+  if (cachedReleasesPromise) return cachedReleasesPromise;
+  cachedReleasesPromise = fetchSpotifyReleasesUncached();
+  return cachedReleasesPromise;
+}
+
+async function fetchSpotifyReleasesUncached(): Promise<NormalizedRelease[]> {
   const creds = getCredentials();
   if (!creds) {
     console.warn(
@@ -390,6 +447,45 @@ export async function fetchSpotifyReleases(): Promise<NormalizedRelease[]> {
       );
       return sortNewestFirst(fallbackToNormalized());
     }
+
+    // Resolve cross-platform links via Odesli. Odesli unverified rate-limit
+    // is 10 req/min — we throttle at 7s/request to stay safely under and
+    // leave headroom for retries on 429.
+    //
+    // Set SKIP_ODESLI=1 to bypass entirely (e.g. when the cache is already
+    // warm and you want a fast local build, or when Odesli is down).
+    const skipOdesli = envVar("SKIP_ODESLI") === "1";
+    if (skipOdesli) {
+      console.log(
+        `[spotify] SKIP_ODESLI=1 set; using cache-only — platform links will be empty for any uncached release`,
+      );
+    }
+    const ODESLI_THROTTLE_MS = 7_000;
+    console.log(
+      `[spotify] resolving cross-platform links for ${sorted.length} releases via Odesli (${ODESLI_THROTTLE_MS / 1000}s throttle) ...`,
+    );
+    for (let i = 0; i < sorted.length; i++) {
+      const r = sorted[i];
+      if (!r.spotifyUrl) {
+        r.platformLinks = emptyPlatformLinks();
+        continue;
+      }
+      if (skipOdesli) {
+        // Cache-only mode: read previously-fetched data, skip the network.
+        r.platformLinks = getCachedPlatformLinks(r.spotifyUrl) ?? emptyPlatformLinks();
+        continue;
+      }
+      const before = Date.now();
+      r.platformLinks = await fetchPlatformLinks(r.spotifyUrl, r.title);
+      const elapsed = Date.now() - before;
+      // Only throttle when we actually hit the network. Cache hits return
+      // in <5ms — no need to sleep, build stays fast.
+      if (i < sorted.length - 1 && elapsed > 100) {
+        await sleep(ODESLI_THROTTLE_MS);
+      }
+    }
+    flushPlatformLinkCache();
+    console.log(`[spotify] cross-platform link resolution complete`);
     return sorted;
   } catch (e) {
     console.warn(

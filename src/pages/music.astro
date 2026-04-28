@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { fetchSpotifyReleases } from "../lib/spotify";
+import type { PlatformLinks } from "../lib/songlink";
 
 // Pulled at build time. Falls back to src/data/releases.json when
 // SPOTIFY_CLIENT_ID / SPOTIFY_CLIENT_SECRET are missing or the API errors.
@@ -9,6 +10,19 @@ const releases = await fetchSpotifyReleases();
 function typeLabel(t: string) {
   return t === "ep" ? "EP" : t.charAt(0).toUpperCase() + t.slice(1);
 }
+
+// Display order is intentional: Spotify primary, Apple Music second
+// (Odesli has near-100% Apple coverage for anything on Spotify), then the
+// rest by general US listener share.
+const SECONDARY_PLATFORMS: { key: keyof PlatformLinks; label: string }[] = [
+  { key: "appleMusic",   label: "Apple Music" },
+  { key: "youtubeMusic", label: "YouTube Music" },
+  { key: "tidal",        label: "Tidal" },
+  { key: "amazonMusic",  label: "Amazon Music" },
+  { key: "deezer",       label: "Deezer" },
+  { key: "pandora",      label: "Pandora" },
+  { key: "soundcloud",   label: "SoundCloud" },
+];
 ---
 
 <BaseLayout title="Music — Vibin' Psybin and the Sunlight Band">
@@ -54,9 +68,43 @@ function typeLabel(t: string) {
               {r.notes && <p class="notes">{r.notes}</p>}
               <div class="links">
                 {r.spotifyUrl ? (
-                  <a class="btn btn-solid" href={r.spotifyUrl} target="_blank" rel="noopener">
-                    Listen on Spotify
-                  </a>
+                  <div class="platform-row">
+                    {/* Primary: Spotify */}
+                    <a
+                      class="btn btn-solid platform-btn platform-primary"
+                      href={r.platformLinks?.spotify ?? r.spotifyUrl}
+                      target="_blank"
+                      rel="noopener"
+                    >
+                      Listen on Spotify
+                    </a>
+                    {/* Secondary platforms — only render when Odesli resolved a URL */}
+                    {r.platformLinks && SECONDARY_PLATFORMS.map((p) => {
+                      const href = r.platformLinks?.[p.key];
+                      if (!href) return null;
+                      return (
+                        <a
+                          class="btn platform-btn platform-secondary"
+                          href={href}
+                          target="_blank"
+                          rel="noopener"
+                        >
+                          {p.label}
+                        </a>
+                      );
+                    })}
+                    {/* Bandcamp from per-release overrides (data seam for later) */}
+                    {r.bandcampUrl && (
+                      <a
+                        class="btn platform-btn platform-secondary"
+                        href={r.bandcampUrl}
+                        target="_blank"
+                        rel="noopener"
+                      >
+                        Bandcamp
+                      </a>
+                    )}
+                  </div>
                 ) : (
                   <span class="muted coming">Streaming links coming soon</span>
                 )}
@@ -194,6 +242,34 @@ function typeLabel(t: string) {
     }
     .links { margin-top: 1rem; }
     .coming { font-size: 0.9rem; font-style: italic; }
+
+    /* Multi-platform picker: wraps cleanly on narrow viewports. */
+    .platform-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      align-items: center;
+    }
+    .platform-btn {
+      /* shrink the standard .btn slightly so 8 fit comfortably on mobile */
+      padding: 0.6rem 1rem;
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+    }
+    .platform-primary {
+      /* keep primary visually weighted */
+      padding: 0.75rem 1.25rem;
+      font-size: 0.8rem;
+    }
+    .platform-secondary {
+      border-color: var(--line);
+      color: var(--fg-muted);
+    }
+    .platform-secondary:hover {
+      background: transparent;
+      border-color: var(--accent-2);
+      color: var(--accent-2);
+    }
 
     @media (min-width: 760px) {
       .release {
