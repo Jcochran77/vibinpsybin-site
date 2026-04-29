@@ -24,6 +24,7 @@ import {
   sleep,
   type PlatformLinks,
 } from "./songlink";
+import { fillAppleMusicGaps } from "./itunes";
 
 // Artist IDs confirmed by Joe.
 const ARTIST_IDS: { id: string; displayName: string }[] = [
@@ -518,6 +519,21 @@ async function fetchSpotifyReleasesUncached(): Promise<NormalizedRelease[]> {
     }
     flushPlatformLinkCache();
     console.log(`[spotify] cross-platform link resolution complete`);
+
+    // iTunes Search fallback: Odesli is unreliable for Apple Music matches
+    // on Joe's catalog (returns null even though every release IS on Apple
+    // Music). Fill any remaining gaps directly from iTunes Search API.
+    // Only mutates `appleMusic` slots that came back null from Odesli —
+    // existing data is never overridden.
+    try {
+      await fillAppleMusicGaps(sorted);
+    } catch (e) {
+      console.warn(
+        "[itunes] fallback resolver threw; continuing without iTunes fills:",
+        e instanceof Error ? e.message : e,
+      );
+    }
+
     return sorted;
   } catch (e) {
     console.warn(
