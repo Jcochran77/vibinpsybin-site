@@ -13,8 +13,10 @@ function typeLabel(t: string) {
 
 // Display order is intentional: Spotify primary, Apple Music second
 // (Odesli has near-100% Apple coverage for anything on Spotify), then the
-// rest by general US listener share.
-const SECONDARY_PLATFORMS: { key: keyof PlatformLinks; label: string }[] = [
+// rest by general US listener share. Bandcamp comes from per-release
+// overrides (data seam) so it lives outside PlatformLinks.
+const PLATFORM_ORDER: { key: keyof PlatformLinks; label: string }[] = [
+  { key: "spotify",      label: "Spotify" },
   { key: "appleMusic",   label: "Apple Music" },
   { key: "youtubeMusic", label: "YouTube Music" },
   { key: "tidal",        label: "Tidal" },
@@ -23,6 +25,28 @@ const SECONDARY_PLATFORMS: { key: keyof PlatformLinks; label: string }[] = [
   { key: "pandora",      label: "Pandora" },
   { key: "soundcloud",   label: "SoundCloud" },
 ];
+
+// Build per-release dropdown entries: walk PLATFORM_ORDER, keep only the
+// platforms we actually have a URL for, then append Bandcamp if present.
+// Spotify always falls back to r.spotifyUrl when Odesli hasn't resolved yet.
+function buildPlatformEntries(r: {
+  spotifyUrl: string | null;
+  bandcampUrl?: string | null;
+  platformLinks?: PlatformLinks | null;
+}): { label: string; href: string }[] {
+  const entries: { label: string; href: string }[] = [];
+  for (const p of PLATFORM_ORDER) {
+    let href: string | null | undefined;
+    if (p.key === "spotify") {
+      href = r.platformLinks?.spotify ?? r.spotifyUrl;
+    } else {
+      href = r.platformLinks?.[p.key];
+    }
+    if (href) entries.push({ label: p.label, href });
+  }
+  if (r.bandcampUrl) entries.push({ label: "Bandcamp", href: r.bandcampUrl });
+  return entries;
+}
 ---
 
 <BaseLayout title="Music — Vibin' Psybin and the Sunlight Band">
@@ -67,47 +91,67 @@ const SECONDARY_PLATFORMS: { key: keyof PlatformLinks; label: string }[] = [
               )}
               {r.notes && <p class="notes">{r.notes}</p>}
               <div class="links">
-                {r.spotifyUrl ? (
-                  <div class="platform-row">
-                    {/* Primary: Spotify */}
-                    <a
-                      class="btn btn-solid platform-btn platform-primary"
-                      href={r.platformLinks?.spotify ?? r.spotifyUrl}
-                      target="_blank"
-                      rel="noopener"
-                    >
-                      Listen on Spotify
-                    </a>
-                    {/* Secondary platforms — only render when Odesli resolved a URL */}
-                    {r.platformLinks && SECONDARY_PLATFORMS.map((p) => {
-                      const href = r.platformLinks?.[p.key];
-                      if (!href) return null;
-                      return (
-                        <a
-                          class="btn platform-btn platform-secondary"
-                          href={href}
-                          target="_blank"
-                          rel="noopener"
-                        >
-                          {p.label}
-                        </a>
-                      );
-                    })}
-                    {/* Bandcamp from per-release overrides (data seam for later) */}
-                    {r.bandcampUrl && (
+                {(() => {
+                  const entries = buildPlatformEntries(r);
+                  if (entries.length === 0) {
+                    return <span class="muted coming">Streaming links coming soon</span>;
+                  }
+                  // Single-platform shortcut: skip the dropdown chrome and link
+                  // directly to the one place this release exists.
+                  if (entries.length === 1) {
+                    const only = entries[0];
+                    return (
                       <a
-                        class="btn platform-btn platform-secondary"
-                        href={r.bandcampUrl}
+                        class="btn btn-solid listen-btn listen-btn-single"
+                        href={only.href}
                         target="_blank"
                         rel="noopener"
                       >
-                        Bandcamp
+                        Listen on {only.label}
                       </a>
-                    )}
-                  </div>
-                ) : (
-                  <span class="muted coming">Streaming links coming soon</span>
-                )}
+                    );
+                  }
+                  // Multi-platform: "Listen" button toggles a dropdown.
+                  // Each dropdown needs a unique id so the toggle script can
+                  // pair button↔menu and so click-outside math works.
+                  const ddId = `listen-dd-${idx}`;
+                  return (
+                    <div class="listen-dropdown" data-listen-dropdown>
+                      <button
+                        type="button"
+                        class="btn btn-solid listen-btn"
+                        aria-haspopup="menu"
+                        aria-expanded="false"
+                        aria-controls={ddId}
+                        data-listen-toggle
+                      >
+                        Listen
+                        <span class="listen-caret" aria-hidden="true">▾</span>
+                      </button>
+                      <ul
+                        id={ddId}
+                        class="listen-menu"
+                        role="menu"
+                        data-listen-menu
+                        hidden
+                      >
+                        {entries.map((e) => (
+                          <li role="none">
+                            <a
+                              role="menuitem"
+                              class="listen-menu-item"
+                              href={e.href}
+                              target="_blank"
+                              rel="noopener"
+                            >
+                              {e.label}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  );
+                })()}
               </div>
               <p class="song-note">
                 <a href={`/contact?re=${encodeURIComponent(r.title)}`}>
@@ -243,32 +287,77 @@ const SECONDARY_PLATFORMS: { key: keyof PlatformLinks; label: string }[] = [
     .links { margin-top: 1rem; }
     .coming { font-size: 0.9rem; font-style: italic; }
 
-    /* Multi-platform picker: wraps cleanly on narrow viewports. */
-    .platform-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.6rem;
+    /* Single "Listen" button + dropdown menu. Replaces the old multi-button
+       row to cut visual clutter. */
+    .listen-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    .listen-btn {
+      display: inline-flex;
       align-items: center;
-    }
-    .platform-btn {
-      /* shrink the standard .btn slightly so 8 fit comfortably on mobile */
-      padding: 0.6rem 1rem;
-      font-size: 0.75rem;
-      letter-spacing: 0.12em;
-    }
-    .platform-primary {
-      /* keep primary visually weighted */
+      gap: 0.5rem;
       padding: 0.75rem 1.25rem;
       font-size: 0.8rem;
+      letter-spacing: 0.12em;
+      cursor: pointer;
     }
-    .platform-secondary {
-      border-color: var(--line);
-      color: var(--fg-muted);
+    .listen-btn-single {
+      /* Used when only one platform resolved — just a direct link button. */
+      display: inline-flex;
     }
-    .platform-secondary:hover {
-      background: transparent;
-      border-color: var(--accent-2);
-      color: var(--accent-2);
+    .listen-caret {
+      font-size: 0.7rem;
+      line-height: 1;
+      transition: transform 0.2s ease;
+    }
+    .listen-dropdown[data-open="true"] .listen-caret {
+      transform: rotate(180deg);
+    }
+    .listen-menu {
+      position: absolute;
+      top: calc(100% + 0.5rem);
+      left: 0;
+      z-index: 20;
+      min-width: 14rem;
+      list-style: none;
+      padding: 0.4rem;
+      margin: 0;
+      background: var(--bg-elev, #14111c);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      box-shadow:
+        0 18px 40px rgba(0, 0, 0, 0.55),
+        0 0 0 1px rgba(180, 90, 220, 0.08) inset;
+      /* psychedelic accent: subtle violet→magenta edge glow */
+      background-image:
+        linear-gradient(180deg, rgba(120, 80, 200, 0.06) 0%, rgba(0, 0, 0, 0) 60%);
+    }
+    .listen-menu[hidden] { display: none; }
+    .listen-menu-item {
+      display: block;
+      padding: 0.55rem 0.85rem;
+      font-family: var(--font-sans);
+      font-size: 0.8rem;
+      letter-spacing: 0.06em;
+      color: var(--fg);
+      text-decoration: none;
+      border-radius: 4px;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+    .listen-menu-item:hover,
+    .listen-menu-item:focus-visible {
+      background: rgba(180, 90, 220, 0.12);
+      color: var(--accent-2, #f0a020);
+      outline: none;
+    }
+    .listen-menu-item:focus-visible {
+      box-shadow: 0 0 0 1px var(--accent-2, #f0a020);
+    }
+    /* First item (Spotify in normal case) gets a subtle highlight to keep
+       the "primary" affordance Joe had before. */
+    .listen-menu li:first-child .listen-menu-item {
+      color: var(--accent-2, #f0a020);
     }
 
     @media (min-width: 760px) {
@@ -285,4 +374,68 @@ const SECONDARY_PLATFORMS: { key: keyof PlatformLinks; label: string }[] = [
       .release-cover { max-width: none; }
     }
   </style>
+
+  <script>
+    // Listen-dropdown behavior: toggle on click/Enter/Space, close on Esc
+    // and on outside click. Pure vanilla, no UI lib.
+    (() => {
+      const dropdowns = document.querySelectorAll<HTMLElement>("[data-listen-dropdown]");
+      if (dropdowns.length === 0) return;
+
+      function closeAll(except?: HTMLElement) {
+        dropdowns.forEach((dd) => {
+          if (dd === except) return;
+          const btn = dd.querySelector<HTMLButtonElement>("[data-listen-toggle]");
+          const menu = dd.querySelector<HTMLElement>("[data-listen-menu]");
+          if (!btn || !menu) return;
+          dd.removeAttribute("data-open");
+          btn.setAttribute("aria-expanded", "false");
+          menu.hidden = true;
+        });
+      }
+
+      dropdowns.forEach((dd) => {
+        const btn = dd.querySelector<HTMLButtonElement>("[data-listen-toggle]");
+        const menu = dd.querySelector<HTMLElement>("[data-listen-menu]");
+        if (!btn || !menu) return;
+
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const open = dd.getAttribute("data-open") === "true";
+          if (open) {
+            dd.removeAttribute("data-open");
+            btn.setAttribute("aria-expanded", "false");
+            menu.hidden = true;
+          } else {
+            closeAll(dd);
+            dd.setAttribute("data-open", "true");
+            btn.setAttribute("aria-expanded", "true");
+            menu.hidden = false;
+          }
+        });
+
+        // Esc closes and returns focus to the toggle.
+        dd.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") {
+            if (dd.getAttribute("data-open") === "true") {
+              dd.removeAttribute("data-open");
+              btn.setAttribute("aria-expanded", "false");
+              menu.hidden = true;
+              btn.focus();
+            }
+          }
+        });
+      });
+
+      // Click outside any dropdown -> close all.
+      document.addEventListener("click", (e) => {
+        const target = e.target as Node | null;
+        if (!target) return closeAll();
+        for (const dd of Array.from(dropdowns)) {
+          if (dd.contains(target)) return;
+        }
+        closeAll();
+      });
+    })();
+  </script>
 </BaseLayout>
