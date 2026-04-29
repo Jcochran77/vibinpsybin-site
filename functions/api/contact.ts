@@ -20,6 +20,7 @@ interface Env {
   RESEND_API_KEY: string;
   RESEND_FROM_ADDRESS?: string;
   RESEND_TO_ADDRESS?: string;
+  CC_SUBMITTER?: string; // "true" to enable CC-submitter (requires verified domain in Resend)
   TURNSTILE_SECRET_KEY?: string;
   TELEGRAM_BOT_TOKEN?: string;
   TELEGRAM_CHAT_ID?: string;
@@ -151,8 +152,17 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     `NOTE: This email was sent because someone (claiming to be you) submitted a Say Hey form at vibinpsybin.band/contact. If this wasn't you, please reply to let Joe know — your email may have been spoofed.`,
   ].filter(Boolean).join("\n");
 
+  // CC-submitter (anti-impersonation) is GATED on domain verification.
+  // Resend's sandbox sender (onboarding@resend.dev) can only deliver to the
+  // verified-account email, so adding a submitter we don't own causes a 422
+  // and the whole send fails. Once the vibinpsybin.band domain is verified
+  // in Resend (and RESEND_FROM_ADDRESS is updated to a sayhey@... sender),
+  // flip CC_SUBMITTER to true via env var to re-enable.
   // De-dupe in case submitter == RESEND_TO_ADDRESS.
-  const recipients = Array.from(new Set([to, email]));
+  const ccEnabled = (env.CC_SUBMITTER || "").toLowerCase() === "true";
+  const recipients = ccEnabled
+    ? Array.from(new Set([to, email]))
+    : [to];
 
   // --- Primary: Resend ---
   let resendId: string | undefined;
@@ -175,7 +185,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     if (!res.ok) {
       const detail = await res.text().catch(() => "");
       console.error("contact: resend failed", { status: res.status, detail });
-      return json({ error: "Could not send. Please email us directly at vibinpsybin@gmail.com." }, 500);
+      return json({ error: "Could not send. Please email us directly at josephcochran73@gmail.com." }, 500);
     }
     const body = (await res.json().catch(() => null)) as { id?: string } | null;
     resendId = body?.id;
