@@ -14,6 +14,9 @@
 // do NOT delete it until the Spotify path has been green in prod for a
 // couple of deploys.
 
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+
 import fallbackReleases from "../data/releases.json";
 import releaseOverrides from "../data/release-overrides.json";
 import {
@@ -25,6 +28,116 @@ import {
   type PlatformLinks,
 } from "./songlink";
 import { fillAppleMusicGaps } from "./itunes";
+
+// --- Release-manifest cache (Fallback 1) ---
+//
+// When Spotify is reachable, we persist the FULLY-RESOLVED release list
+// (Spotify metadata + Odesli platform links + iTunes Apple Music gap-fills)
+// to .releases-cache.json. Next build, if Spotify fails (rate limit, network,
+// auth — anything), we use this manifest instead of the stale skeleton in
+// src/data/releases.json. The static releases.json stays as Fallback 2 (last
+// resort) and is unchanged.
+//
+// Schema:
+//   {
+//     "version": 1,
+//     "lastUpdated": "<ISO timestamp>",
+//     "artistIds": ["<id1>", "<id2>"],
+//     "releases": NormalizedRelease[]
+//   }
+//
+// The artistIds field is for cleanly invalidating the cache when we add or
+// remove an artist — readers can opt to ignore the cache if the set
+// disagrees with current ARTIST_IDS. We DON'T currently invalidate (the
+// cache is still better than nothing) but the data is there for future use.
+const RELEASES_CACHE_VERSION = 1;
+const RELEASES_CACHE_PATH = resolve(process.cwd(), ".releases-cache.json");
+
+interface ReleasesCacheShape {
+  version: number;
+  lastUpdated: string;
+  artistIds: string[];
+  releases: NormalizedRelease[];
+}
+
+function readReleasesCache(): ReleasesCacheShape | null {
+  try {
+    if (!existsSync(RELEASES_CACHE_PATH)) return null;
+    const raw = readFileSync(RELEASES_CACHE_PATH, "utf8");
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object") return null;
+    const shape = parsed as Partial<ReleasesCacheShape>;
+    if (
+      typeof shape.version !== "number" ||
+      !Array.isArray(shape.releases) ||
+      shape.releases.length === 0
+    ) {
+      return null;
+    }
+    if (shape.version !== RELEASES_CACHE_VERSION) {
+      console.warn(
+        `[releases-cache] schema version mismatch (file=${shape.version}, code=${RELEASES_CACHE_VERSION}); ignoring cache`,
+      );
+      return null;
+    }
+    return shape as ReleasesCacheShape;
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.warn(`[releases-cache] read failed (${msg}); ignoring cache`);
+    return null;
+  }
+}
+
+function writeReleasesCache(releases: NormalizedRelease[], artistIds: string[]): void {
+  try {
+    const payload: ReleasesCacheShape = {
+      version: RELEASES_CACHE_VERSION,
+      lastUpdated: new Date().toISOString(),
+      artistIds,
+      releases,
+    };
+    mkdirSync(dirname(RELEASES_CACHE_PATH), { recursive: true });
+    writeFileSync(
+      RELEASES_CACHE_PATH,
+      JSON.stringify(payload, null, 2) + "\n",
+      "utf8",
+    );
+    console.log(
+      `[releases-cache] wrote ${releases.length} entries -> ${RELEASES_CACHE_PATH}`,
+    );
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.warn(`[releases-cache] write failed: ${msg}`);
+  }
+}
+
+/**
+ * Normalize a cache entry into a NormalizedRelease. Defensive against older
+ * or partial entries (e.g. missing platformLinks). Anything not present is
+ * given a safe default so the renderer doesn't crash.
+ */
+function reviveCachedRelease(r: Partial<NormalizedRelease> & { id: string; title: string }): NormalizedRelease {
+  const override = getOverride(r.id);
+  return {
+    id: r.id,
+    title: r.title,
+    artist: r.artist ?? "",
+    year: typeof r.year === "number" ? r.year : 0,
+    type: (["album", "single", "ep", "compilation"].includes(r.type as string)
+      ? r.type
+      : "single") as ReleaseType,
+    coverUrl: r.coverUrl ?? null,
+    spotifyUrl: r.spotifyUrl ?? null,
+    trackNames: Array.isArray(r.trackNames) ? r.trackNames : [],
+    releaseDate: r.releaseDate ?? `${r.year ?? 0}-01-01`,
+    notes: r.notes,
+    platformLinks: r.platformLinks ?? null,
+    // Always re-resolve bandcampUrl from the override file so manual edits
+    // there take effect on the next build without needing a Spotify-live
+    // refresh.
+    bandcampUrl: override?.bandcampUrl ?? r.bandcampUrl ?? null,
+  };
+}
 
 // Artist IDs confirmed by Joe.
 const ARTIST_IDS: { id: string; displayName: string }[] = [
@@ -422,13 +535,40 @@ export async function fetchSpotifyReleases(): Promise<NormalizedRelease[]> {
   return cachedReleasesPromise;
 }
 
+/**
+ * 3-tier degradation when Spotify is unavailable:
+ *   Fallback 1: cached release manifest (.releases-cache.json) — has full
+ *               Spotify metadata + resolved platform links from the last
+ *               good build. Renders the Music page identically to a live
+ *               build.
+ *   Fallback 2: src/data/releases.json — stale skeleton, no Spotify URLs,
+ *               no platformLinks. Site renders with "Streaming links coming
+ *               soon" placeholders. Last resort only.
+ *
+ * `reason` is logged for build-time visibility so we know exactly which
+ * tier is active and why.
+ */
+function fallbackChain(reason: string): NormalizedRelease[] {
+  const cached = readReleasesCache();
+  if (cached) {
+    const revived = cached.releases.map(reviveCachedRelease);
+    console.warn(
+      `[spotify] ${reason}; using cached release manifest (${revived.length} entries from ${RELEASES_CACHE_PATH}, last updated ${cached.lastUpdated})`,
+    );
+    return sortNewestFirst(revived);
+  }
+  console.warn(
+    `[spotify] ${reason}; no release-manifest cache available, falling back to src/data/releases.json (skeleton — listen buttons will be empty)`,
+  );
+  return sortNewestFirst(fallbackToNormalized());
+}
+
 async function fetchSpotifyReleasesUncached(): Promise<NormalizedRelease[]> {
   const creds = getCredentials();
   if (!creds) {
-    console.warn(
-      "[spotify] SPOTIFY_CLIENT_ID / SPOTIFY_CLIENT_SECRET not set; falling back to src/data/releases.json",
+    return fallbackChain(
+      "SPOTIFY_CLIENT_ID / SPOTIFY_CLIENT_SECRET not set",
     );
-    return sortNewestFirst(fallbackToNormalized());
   }
 
   try {
@@ -475,10 +615,7 @@ async function fetchSpotifyReleasesUncached(): Promise<NormalizedRelease[]> {
 
     const sorted = sortNewestFirst(visible);
     if (sorted.length === 0) {
-      console.warn(
-        "[spotify] returned zero releases after dedupe; falling back to releases.json",
-      );
-      return sortNewestFirst(fallbackToNormalized());
+      return fallbackChain("returned zero releases after dedupe");
     }
 
     // Resolve cross-platform links via Odesli. Odesli unverified rate-limit
@@ -534,12 +671,17 @@ async function fetchSpotifyReleasesUncached(): Promise<NormalizedRelease[]> {
       );
     }
 
+    // Persist the fully-resolved manifest for next-build resilience. This is
+    // the source of truth for Fallback 1 — written ONLY on a successful
+    // Spotify pipeline so we never overwrite good cache with degraded data.
+    writeReleasesCache(
+      sorted,
+      ARTIST_IDS.map((a) => a.id),
+    );
+
     return sorted;
   } catch (e) {
-    console.warn(
-      "[spotify] fetch failed; falling back to releases.json:",
-      e instanceof Error ? e.message : e,
-    );
-    return sortNewestFirst(fallbackToNormalized());
+    const reason = `fetch failed: ${e instanceof Error ? e.message : String(e)}`;
+    return fallbackChain(reason);
   }
 }

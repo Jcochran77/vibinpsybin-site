@@ -1,0 +1,337 @@
+{
+  "version": 1,
+  "lastUpdated": "2026-04-29T15:25:20.295Z",
+  "artistIds": [
+    "40SRpqCKiQZZ3alrYeXAYR",
+    "16AgfIKYaZe0mmiAHuzVta"
+  ],
+  "releases": [
+    {
+      "id": "372PbPefzKQ2XOEO5miRJy",
+      "title": "The Ride",
+      "artist": "Vibin' Psybin and the Sunlight Band",
+      "year": 2026,
+      "type": "single",
+      "coverUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/58/f7/da/58f7da21-43f6-b966-6db1-6e4f32b3f5ef/artwork.jpg/640x640bb.jpg",
+      "spotifyUrl": "https://open.spotify.com/album/372PbPefzKQ2XOEO5miRJy",
+      "trackNames": [
+        "The Ride"
+      ],
+      "releaseDate": "2026-04-24",
+      "platformLinks": {
+        "spotify": "https://open.spotify.com/album/372PbPefzKQ2XOEO5miRJy",
+        "appleMusic": "https://music.apple.com/us/album/the-ride-single/1884200215",
+        "youtubeMusic": null,
+        "tidal": null,
+        "amazonMusic": null,
+        "deezer": null,
+        "pandora": "https://www.pandora.com/AL:62959540",
+        "soundcloud": null
+      },
+      "bandcampUrl": null
+    },
+    {
+      "id": "3bonyNNLXkwF8wnJR3wJza",
+      "title": "Get Over Get On / Reflections (feat. Hotelonfire)",
+      "artist": "Vibin' Psybin and the Sunlight Band",
+      "year": 2025,
+      "type": "single",
+      "coverUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/ca/b7/15/cab7154b-87a8-d9a8-04b1-d61c4279b0f0/artwork.jpg/640x640bb.jpg",
+      "spotifyUrl": "https://open.spotify.com/album/3bonyNNLXkwF8wnJR3wJza",
+      "trackNames": [
+        "Get Over Get On / Reflections (feat. Hotelonfire)"
+      ],
+      "releaseDate": "2025-08-29",
+      "platformLinks": {
+        "spotify": "https://open.spotify.com/album/3bonyNNLXkwF8wnJR3wJza",
+        "appleMusic": "https://music.apple.com/us/album/get-over-get-on-reflections-feat-hotelonfire-single/1818934454",
+        "youtubeMusic": null,
+        "tidal": null,
+        "amazonMusic": null,
+        "deezer": null,
+        "pandora": "https://www.pandora.com/AL:49184908",
+        "soundcloud": null
+      },
+      "bandcampUrl": null
+    },
+    {
+      "id": "7MUINpHacoQUNSL2itIvQq",
+      "title": "To The Wind",
+      "artist": "Vibin' Psybin and the Sunlight Band",
+      "year": 2025,
+      "type": "ep",
+      "coverUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/3a/92/fe/3a92fef4-6f25-1a30-8474-4ed7f7f918d4/artwork.jpg/640x640bb.jpg",
+      "spotifyUrl": "https://open.spotify.com/album/7MUINpHacoQUNSL2itIvQq",
+      "trackNames": [
+        "To The Wind",
+        "Let Me Loose",
+        "The In Between",
+        "Po-Dunk Baby"
+      ],
+      "releaseDate": "2025-07-25",
+      "platformLinks": {
+        "spotify": "https://open.spotify.com/album/7MUINpHacoQUNSL2itIvQq",
+        "appleMusic": "https://music.apple.com/us/album/to-the-wind-ep/1818885236",
+        "youtubeMusic": null,
+        "tidal": "https://listen.tidal.com/album/440255642",
+        "amazonMusic": "https://music.amazon.com/albums/B0FC1YYPNN",
+        "deezer": "https://www.deezer.com/album/767698471",
+        "pandora": "https://www.pandora.com/AL:48382731",
+        "soundcloud": null
+      },
+      "bandcampUrl": null
+    },
+    {
+      "id": "1s8KdPMs8lJfTT7MuZlCN9",
+      "title": "Hippie Cowboy",
+      "artist": "Vibin' Psybin and the Sunlight Band",
+      "year": 2024,
+      "type": "album",
+      "coverUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/6d/d3/db/6dd3db8f-fb39-33d6-68cb-97c6df903309/artwork.jpg/640x640bb.jpg",
+      "spotifyUrl": "https://open.spotify.com/album/1s8KdPMs8lJfTT7MuZlCN9",
+      "trackNames": [
+        "Do No Wrong (feat. Sam Erin & Kesley Bou)",
+        "Good Time Girls (feat. Kenny Sharp)",
+        "King of Tennessee",
+        "I Know A Girl",
+        "Because You Said So",
+        "Keep It Kool",
+        "Songbird (feat. Johnny Cattini & Kesley Bou)",
+        "Hippie Cowboy (feat. Matthew Curry)",
+        "It Wasn't Meant To Be"
+      ],
+      "releaseDate": "2024-09-13",
+      "platformLinks": {
+        "spotify": "https://open.spotify.com/album/1s8KdPMs8lJfTT7MuZlCN9",
+        "appleMusic": "https://music.apple.com/us/album/hippie-cowboy/1763105739",
+        "youtubeMusic": null,
+        "tidal": "https://listen.tidal.com/album/381385809",
+        "amazonMusic": "https://music.amazon.com/albums/B0DD6Z8ZJX",
+        "deezer": "https://www.deezer.com/album/630155451",
+        "pandora": "https://www.pandora.com/AL:38103471",
+        "soundcloud": null
+      },
+      "bandcampUrl": null
+    },
+    {
+      "id": "2Cghn84jokHe0B55qrSKqX",
+      "title": "Live Fast",
+      "artist": "Psybin",
+      "year": 2023,
+      "type": "ep",
+      "coverUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/2d/94/03/2d9403a7-8368-c3c7-fb62-3ee0cb403624/artwork.jpg/640x640bb.jpg",
+      "spotifyUrl": "https://open.spotify.com/album/2Cghn84jokHe0B55qrSKqX",
+      "trackNames": [
+        "A Million Miles (feat. Jessica Childress) [Live]",
+        "Love Song #2 (Live)",
+        "Live Fast (Live)",
+        "Headlights (A Brand New Day) [Live]",
+        "The Edge (Live)",
+        "I Was Wrong (Live)"
+      ],
+      "releaseDate": "2023-02-10",
+      "platformLinks": {
+        "spotify": "https://open.spotify.com/album/2Cghn84jokHe0B55qrSKqX",
+        "appleMusic": "https://music.apple.com/us/album/live-fast-ep/1655258621",
+        "youtubeMusic": null,
+        "tidal": "https://listen.tidal.com/album/261317184",
+        "amazonMusic": null,
+        "deezer": null,
+        "pandora": "https://www.pandora.com/AL:19534156",
+        "soundcloud": null
+      },
+      "bandcampUrl": null
+    },
+    {
+      "id": "3eFBzYqP9r7u0AvS9g7xFT",
+      "title": "Tobago",
+      "artist": "Psybin",
+      "year": 2022,
+      "type": "single",
+      "coverUrl": "https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e0216538cafd89efa53317923f8",
+      "spotifyUrl": "https://open.spotify.com/album/3eFBzYqP9r7u0AvS9g7xFT",
+      "trackNames": [],
+      "releaseDate": "2022-03-25",
+      "platformLinks": {
+        "spotify": "https://open.spotify.com/album/3eFBzYqP9r7u0AvS9g7xFT",
+        "appleMusic": null,
+        "youtubeMusic": null,
+        "tidal": null,
+        "amazonMusic": "https://music.amazon.com/albums/B09T66Y8LR",
+        "deezer": null,
+        "pandora": null,
+        "soundcloud": null
+      },
+      "bandcampUrl": null
+    },
+    {
+      "id": "0MLdsz78MRs1E9QOxSrF9Q",
+      "title": "The Moment",
+      "artist": "Psybin",
+      "year": 2022,
+      "type": "single",
+      "coverUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/be/06/e0/be06e092-2591-290e-81df-daf44313e92c/artwork.jpg/640x640bb.jpg",
+      "spotifyUrl": "https://open.spotify.com/album/0MLdsz78MRs1E9QOxSrF9Q",
+      "trackNames": [
+        "The Moment"
+      ],
+      "releaseDate": "2022-01-21",
+      "platformLinks": {
+        "spotify": "https://open.spotify.com/album/0MLdsz78MRs1E9QOxSrF9Q",
+        "appleMusic": "https://music.apple.com/us/album/the-moment-single/1601061879",
+        "youtubeMusic": null,
+        "tidal": null,
+        "amazonMusic": null,
+        "deezer": null,
+        "pandora": "https://www.pandora.com/AL:11911452",
+        "soundcloud": null
+      },
+      "bandcampUrl": null
+    },
+    {
+      "id": "1RqvjuMVJ7537H1rHVSP3Y",
+      "title": "When I'm With You",
+      "artist": "Psybin",
+      "year": 2021,
+      "type": "single",
+      "coverUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/ae/d8/4d/aed84d02-3c9b-7523-425f-fae1d90eef97/artwork.jpg/640x640bb.jpg",
+      "spotifyUrl": "https://open.spotify.com/album/1RqvjuMVJ7537H1rHVSP3Y",
+      "trackNames": [
+        "When I'm With You"
+      ],
+      "releaseDate": "2021-12-17",
+      "platformLinks": {
+        "spotify": "https://open.spotify.com/album/1RqvjuMVJ7537H1rHVSP3Y",
+        "appleMusic": "https://music.apple.com/us/album/when-im-with-you-single/1596860145",
+        "youtubeMusic": null,
+        "tidal": null,
+        "amazonMusic": null,
+        "deezer": null,
+        "pandora": "https://www.pandora.com/AL:11914223",
+        "soundcloud": null
+      },
+      "bandcampUrl": null
+    },
+    {
+      "id": "6RZ4gm5OSM1JhpsdeK1QAR",
+      "title": "On the Run",
+      "artist": "Psybin",
+      "year": 2021,
+      "type": "single",
+      "coverUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/5e/e4/7f/5ee47f1b-489f-3e90-6595-2388509d772d/artwork.jpg/640x640bb.jpg",
+      "spotifyUrl": "https://open.spotify.com/album/6RZ4gm5OSM1JhpsdeK1QAR",
+      "trackNames": [
+        "On the Run"
+      ],
+      "releaseDate": "2021-12-03",
+      "platformLinks": {
+        "spotify": "https://open.spotify.com/album/6RZ4gm5OSM1JhpsdeK1QAR",
+        "appleMusic": "https://music.apple.com/us/album/on-the-run-single/1593326665",
+        "youtubeMusic": null,
+        "tidal": null,
+        "amazonMusic": null,
+        "deezer": null,
+        "pandora": "https://www.pandora.com/AL:11261909",
+        "soundcloud": null
+      },
+      "bandcampUrl": null
+    },
+    {
+      "id": "3XV9feQckdU5iv8e7mh8bn",
+      "title": "Token",
+      "artist": "Psybin",
+      "year": 2021,
+      "type": "single",
+      "coverUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/d1/5a/af/d15aaf51-994f-6c61-3158-ecc3d599fa53/198002293398.jpg/640x640bb.jpg",
+      "spotifyUrl": "https://open.spotify.com/album/3XV9feQckdU5iv8e7mh8bn",
+      "trackNames": [
+        "Token"
+      ],
+      "releaseDate": "2021-10-08",
+      "platformLinks": {
+        "spotify": "https://open.spotify.com/album/3XV9feQckdU5iv8e7mh8bn",
+        "appleMusic": "https://music.apple.com/us/album/token-single/1587967968",
+        "youtubeMusic": null,
+        "tidal": null,
+        "amazonMusic": null,
+        "deezer": null,
+        "pandora": "https://www.pandora.com/AL:10921733",
+        "soundcloud": null
+      },
+      "bandcampUrl": null
+    },
+    {
+      "id": "4xZUVlMI0DbSd4ZbwqovG1",
+      "title": "You Deserve Love",
+      "artist": "Psybin",
+      "year": 2020,
+      "type": "single",
+      "coverUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/30/ba/52/30ba52d3-65aa-1d78-5425-e11ee455e232/artwork.jpg/640x640bb.jpg",
+      "spotifyUrl": "https://open.spotify.com/album/4xZUVlMI0DbSd4ZbwqovG1",
+      "trackNames": [
+        "You Deserve Love"
+      ],
+      "releaseDate": "2020-12-04",
+      "platformLinks": {
+        "spotify": "https://open.spotify.com/album/4xZUVlMI0DbSd4ZbwqovG1",
+        "appleMusic": "https://music.apple.com/us/album/you-deserve-love-single/1538860899",
+        "youtubeMusic": null,
+        "tidal": null,
+        "amazonMusic": null,
+        "deezer": null,
+        "pandora": null,
+        "soundcloud": null
+      },
+      "bandcampUrl": null
+    },
+    {
+      "id": "5s2wQhb6iOyO7anyhru3jh",
+      "title": "You'll Live",
+      "artist": "Psybin",
+      "year": 2020,
+      "type": "single",
+      "coverUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/b8/10/cc/b810cc9b-2d10-eaf0-cdd8-8d2c244331b8/artwork.jpg/640x640bb.jpg",
+      "spotifyUrl": "https://open.spotify.com/album/5s2wQhb6iOyO7anyhru3jh",
+      "trackNames": [
+        "You'll Live"
+      ],
+      "releaseDate": "2020-10-23",
+      "platformLinks": {
+        "spotify": "https://open.spotify.com/album/5s2wQhb6iOyO7anyhru3jh",
+        "appleMusic": "https://music.apple.com/us/album/youll-live-single/1532101903",
+        "youtubeMusic": null,
+        "tidal": null,
+        "amazonMusic": null,
+        "deezer": null,
+        "pandora": null,
+        "soundcloud": null
+      },
+      "bandcampUrl": null
+    },
+    {
+      "id": "4tGWDI3J0OHWSWYprn6MMH",
+      "title": "Deja Vu",
+      "artist": "Psybin",
+      "year": 2020,
+      "type": "single",
+      "coverUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/3e/4d/5b/3e4d5b8e-c0ac-7ae0-6586-ad55cf1504e9/artwork.jpg/640x640bb.jpg",
+      "spotifyUrl": "https://open.spotify.com/album/4tGWDI3J0OHWSWYprn6MMH",
+      "trackNames": [
+        "Deja Vu"
+      ],
+      "releaseDate": "2020-07-21",
+      "platformLinks": {
+        "spotify": "https://open.spotify.com/album/4tGWDI3J0OHWSWYprn6MMH",
+        "appleMusic": "https://music.apple.com/us/album/deja-vu-single/1519525683",
+        "youtubeMusic": null,
+        "tidal": null,
+        "amazonMusic": null,
+        "deezer": null,
+        "pandora": null,
+        "soundcloud": null
+      },
+      "bandcampUrl": null
+    }
+  ],
+  "_bootstrapNote": "Initial seed produced by scripts/bootstrap-releases-cache.mjs while Spotify API was rate-limited. Will be replaced by canonical Spotify metadata on the next successful build."
+}
