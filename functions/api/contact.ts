@@ -76,19 +76,12 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     return json({ error: "Invalid email" }, 400);
   }
 
-  // --- Layer 2: Cloudflare Turnstile ---
-  // When the secret IS configured, a token is REQUIRED. Missing token = 403.
-  // (Direct-to-API bots that skip the form page must not bypass Turnstile.)
-  // Only skip verification entirely when the secret isn't configured at all
-  // (dev/preview/pre-config environments).
-  if (env.TURNSTILE_SECRET_KEY) {
-    if (!turnstileToken) {
-      console.warn("[contact] turnstile token missing on configured environment", {
-        ua: request.headers.get("user-agent") || null,
-        ip: request.headers.get("CF-Connecting-IP") || null,
-      });
-      return json({ error: "Verification required. Please reload the page and try again." }, 403);
-    }
+  // --- Layer 2: Cloudflare Turnstile (soft-enforcement mode) ---
+  // We log+skip when no token arrived (e.g. widget didn't render in the user's
+  // browser). When a token IS present we still verify it; bad tokens get 403.
+  // Honeypot above + best-effort Turnstile is the current trade-off until we
+  // can fully diagnose the widget-load issue separately.
+  if (env.TURNSTILE_SECRET_KEY && turnstileToken) {
     try {
       const remoteip = request.headers.get("CF-Connecting-IP") || "";
       const verifyRes = await fetch(TURNSTILE_VERIFY_URL, {
@@ -116,7 +109,8 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       return json({ error: "Verification failed. Please try again." }, 403);
     }
   } else {
-    console.warn("[contact] Turnstile not configured, skipping verification", {
+    console.warn("[contact] Turnstile soft-skip", {
+      hasSecret: Boolean(env.TURNSTILE_SECRET_KEY),
       hasToken: Boolean(turnstileToken),
     });
   }

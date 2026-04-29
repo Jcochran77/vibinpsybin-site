@@ -281,45 +281,12 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
         e.preventDefault();
         msg.textContent = "Sending...";
 
-        // If a Turnstile widget is on the page, make sure we have a fresh token
-        // before submitting. Without this, fast submitters can race the widget
-        // (it hasn't completed its handshake yet) and the server rejects with
-        // "Verification failed."
+        // FormData picks up the Turnstile widget's auto-injected
+        // hidden input named `cf-turnstile-response` if the widget produced one.
+        // We don't block on it here — server decides whether to enforce it.
+        const fd = new FormData(form);
         const turnstile = (window as any).turnstile;
         const widgetEl = document.getElementById("turnstile-widget");
-        if (widgetEl && turnstile) {
-          try {
-            // getResponse() returns "" if the widget hasn't produced a token.
-            // execute() forces the challenge if needed and returns the token via the
-            // existing hidden input on completion. We poll briefly for it.
-            let token = turnstile.getResponse(widgetEl) as string | undefined;
-            if (!token) {
-              // Some widget configurations expose execute(); when present, run it.
-              if (typeof turnstile.execute === "function") {
-                try { turnstile.execute(widgetEl); } catch {}
-              }
-              // Wait up to ~6s for the widget to produce a token.
-              const deadline = Date.now() + 6000;
-              while (Date.now() < deadline) {
-                await new Promise((r) => setTimeout(r, 200));
-                token = turnstile.getResponse(widgetEl) as string | undefined;
-                if (token) break;
-              }
-            }
-            if (!token) {
-              msg.textContent = "Verification didn't load. Reload the page and try again.";
-              return;
-            }
-          } catch {
-            // If anything in the Turnstile flow throws, fall through and let the
-            // server respond. The form will get a clear error if the token is bad.
-          }
-        }
-
-        // FormData picks up the Turnstile widget's auto-injected
-        // hidden input named `cf-turnstile-response`, so the JSON body
-        // includes it without us having to thread it manually.
-        const fd = new FormData(form);
         try {
           const res = await fetch(form.action, {
             method: "POST",
