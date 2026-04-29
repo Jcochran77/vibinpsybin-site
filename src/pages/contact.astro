@@ -93,7 +93,14 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
         </div>
 
         {turnstileSiteKey && (
-          <div class="cf-turnstile" data-sitekey={turnstileSiteKey} data-theme="dark"></div>
+          <div
+            id="turnstile-widget"
+            class="cf-turnstile"
+            data-sitekey={turnstileSiteKey}
+            data-theme="dark"
+            data-retry="auto"
+            data-refresh-expired="auto"
+          ></div>
         )}
 
         <button type="submit" class="btn btn-solid">Send it</button>
@@ -274,11 +281,47 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
     if (form && msg) {
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
+        msg.textContent = "Sending...";
+
+        // If a Turnstile widget is on the page, make sure we have a fresh token
+        // before submitting. Without this, fast submitters can race the widget
+        // (it hasn't completed its handshake yet) and the server rejects with
+        // "Verification failed."
+        const turnstile = (window as any).turnstile;
+        const widgetEl = document.getElementById("turnstile-widget");
+        if (widgetEl && turnstile) {
+          try {
+            // getResponse() returns "" if the widget hasn't produced a token.
+            // execute() forces the challenge if needed and returns the token via the
+            // existing hidden input on completion. We poll briefly for it.
+            let token = turnstile.getResponse(widgetEl) as string | undefined;
+            if (!token) {
+              // Some widget configurations expose execute(); when present, run it.
+              if (typeof turnstile.execute === "function") {
+                try { turnstile.execute(widgetEl); } catch {}
+              }
+              // Wait up to ~6s for the widget to produce a token.
+              const deadline = Date.now() + 6000;
+              while (Date.now() < deadline) {
+                await new Promise((r) => setTimeout(r, 200));
+                token = turnstile.getResponse(widgetEl) as string | undefined;
+                if (token) break;
+              }
+            }
+            if (!token) {
+              msg.textContent = "Verification didn't load. Reload the page and try again.";
+              return;
+            }
+          } catch {
+            // If anything in the Turnstile flow throws, fall through and let the
+            // server respond. The form will get a clear error if the token is bad.
+          }
+        }
+
         // FormData picks up the Turnstile widget's auto-injected
         // hidden input named `cf-turnstile-response`, so the JSON body
         // includes it without us having to thread it manually.
         const fd = new FormData(form);
-        msg.textContent = "Sending...";
         try {
           const res = await fetch(form.action, {
             method: "POST",
@@ -289,15 +332,13 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
             msg.textContent = "🎸 Got it — talk soon.";
             form.reset();
             // Reset Turnstile so the next submit gets a fresh token.
-            const turnstile = (window as any).turnstile;
             if (turnstile && typeof turnstile.reset === "function") {
-              try { turnstile.reset(); } catch {}
+              try { turnstile.reset(widgetEl ?? undefined); } catch {}
             }
           } else if (res.status === 403) {
             msg.textContent = "Verification failed. Please try again.";
-            const turnstile = (window as any).turnstile;
             if (turnstile && typeof turnstile.reset === "function") {
-              try { turnstile.reset(); } catch {}
+              try { turnstile.reset(widgetEl ?? undefined); } catch {}
             }
           } else {
             msg.textContent = "Something went wrong. Try again?";
