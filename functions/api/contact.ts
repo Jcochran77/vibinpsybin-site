@@ -77,14 +77,18 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   }
 
   // --- Layer 2: Cloudflare Turnstile ---
-  // Graceful skip if the secret is not configured OR the client didn't send a token.
-  // (Dev/preview environments without keys must still deliver.)
-  if (!env.TURNSTILE_SECRET_KEY || !turnstileToken) {
-    console.warn("[contact] Turnstile not configured, skipping verification", {
-      hasSecret: Boolean(env.TURNSTILE_SECRET_KEY),
-      hasToken: Boolean(turnstileToken),
-    });
-  } else {
+  // When the secret IS configured, a token is REQUIRED. Missing token = 403.
+  // (Direct-to-API bots that skip the form page must not bypass Turnstile.)
+  // Only skip verification entirely when the secret isn't configured at all
+  // (dev/preview/pre-config environments).
+  if (env.TURNSTILE_SECRET_KEY) {
+    if (!turnstileToken) {
+      console.warn("[contact] turnstile token missing on configured environment", {
+        ua: request.headers.get("user-agent") || null,
+        ip: request.headers.get("CF-Connecting-IP") || null,
+      });
+      return json({ error: "Verification required. Please reload the page and try again." }, 403);
+    }
     try {
       const remoteip = request.headers.get("CF-Connecting-IP") || "";
       const verifyRes = await fetch(TURNSTILE_VERIFY_URL, {
@@ -111,6 +115,10 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       console.error("[contact] turnstile verification error", e);
       return json({ error: "Verification failed. Please try again." }, 403);
     }
+  } else {
+    console.warn("[contact] Turnstile not configured, skipping verification", {
+      hasToken: Boolean(turnstileToken),
+    });
   }
 
   if (!env.RESEND_API_KEY) {
