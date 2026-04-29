@@ -1,10 +1,17 @@
 // POST /api/contact — Say Hey form delivery.
 //
-// Primary: Resend → vibinpsybin@gmail.com (Reply-To = submitter).
+// Defense layers (in order):
+//   1. Honeypot field (`website`) — if filled, silently 200-OK.
+//   2. Cloudflare Turnstile — verified server-side via siteverify.
+//   3. Anti-impersonation — the submitter is CC'd on the outbound email,
+//      so a spoofed claim ("I'm Sarah") immediately reaches the real Sarah.
+//
+// Primary: Resend → vibinpsybin@gmail.com + submitter (Reply-To = submitter).
 // Secondary: best-effort Telegram ping to the Music group.
 //
 // Required env: RESEND_API_KEY
 // Optional env: RESEND_FROM_ADDRESS, RESEND_TO_ADDRESS,
+//               TURNSTILE_SECRET_KEY,
 //               TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
 //
 // All env is read via the Pages function `env` binding (NOT process.env).
@@ -13,6 +20,7 @@ interface Env {
   RESEND_API_KEY: string;
   RESEND_FROM_ADDRESS?: string;
   RESEND_TO_ADDRESS?: string;
+  TURNSTILE_SECRET_KEY?: string;
   TELEGRAM_BOT_TOKEN?: string;
   TELEGRAM_CHAT_ID?: string;
 }
@@ -20,6 +28,7 @@ interface Env {
 const DEFAULT_FROM = "Vibin' Psybin <onboarding@resend.dev>";
 const DEFAULT_TO = "vibinpsybin@gmail.com";
 const DEFAULT_TG_CHAT = "-5203788960";
+const TURNSTILE_VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 
 export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   const json = (body: unknown, status = 200) =>
@@ -28,23 +37,80 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       headers: { "Content-Type": "application/json" },
     });
 
-  let data: { name?: string; email?: string; message?: string; kind?: string } = {};
+  let data: {
+    name?: string;
+    email?: string;
+    message?: string;
+    kind?: string;
+    website?: string;
+    "cf-turnstile-response"?: string;
+  } = {};
   try {
     data = await request.json();
   } catch {
     return json({ error: "Bad request" }, 400);
   }
 
+  // --- Layer 1: Honeypot ---
+  // Bots tend to fill any field they recognize. Real users never see this one.
+  // If it's non-empty, return a 200 so the bot thinks it succeeded — no signal back.
+  const honeypot = (data.website || "").trim();
+  if (honeypot) {
+    console.log("[contact] honeypot triggered", {
+      ua: request.headers.get("user-agent") || null,
+      ip: request.headers.get("CF-Connecting-IP") || null,
+    });
+    return json({ ok: true });
+  }
+
   const name = (data.name || "").trim();
   const email = (data.email || "").trim();
   const message = (data.message || "").trim();
   const kind = (data.kind || "").trim();
+  const turnstileToken = (data["cf-turnstile-response"] || "").trim();
 
   if (!name || !email || !message) {
     return json({ error: "Missing fields" }, 400);
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return json({ error: "Invalid email" }, 400);
+  }
+
+  // --- Layer 2: Cloudflare Turnstile ---
+  // Graceful skip if the secret is not configured OR the client didn't send a token.
+  // (Dev/preview environments without keys must still deliver.)
+  if (!env.TURNSTILE_SECRET_KEY || !turnstileToken) {
+    console.warn("[contact] Turnstile not configured, skipping verification", {
+      hasSecret: Boolean(env.TURNSTILE_SECRET_KEY),
+      hasToken: Boolean(turnstileToken),
+    });
+  } else {
+    try {
+      const remoteip = request.headers.get("CF-Connecting-IP") || "";
+      const verifyRes = await fetch(TURNSTILE_VERIFY_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          secret: env.TURNSTILE_SECRET_KEY,
+          response: turnstileToken,
+          remoteip,
+        }),
+      });
+      const verifyBody = (await verifyRes.json().catch(() => null)) as
+        | { success?: boolean; hostname?: string; "error-codes"?: string[] }
+        | null;
+      if (!verifyBody || verifyBody.success !== true) {
+        console.warn("[contact] turnstile verification failed", {
+          status: verifyRes.status,
+          errors: verifyBody?.["error-codes"] || null,
+        });
+        return json({ error: "Verification failed. Please try again." }, 403);
+      }
+      console.log("[contact] turnstile verified", { hostname: verifyBody.hostname || null });
+    } catch (e) {
+      console.error("[contact] turnstile verification error", e);
+      return json({ error: "Verification failed. Please try again." }, 403);
+    }
   }
 
   if (!env.RESEND_API_KEY) {
@@ -61,6 +127,10 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     ? `Say Hey: ${kind} — from ${name}`
     : `Say Hey from ${name}`;
 
+  // --- Layer 3: Anti-impersonation ---
+  // Identical email goes to BOTH Joe and the submitter. If somebody spoofed
+  // the email field, the real owner of that address sees the message and can
+  // flag it. Note in the body explains why they got it.
   const textBody = [
     `New "Say Hey" message from the Vibin' Psybin site.`,
     ``,
@@ -74,7 +144,13 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     message,
     ``,
     `(Reply directly to this email — it'll go straight to ${name}.)`,
+    ``,
+    `---`,
+    `NOTE: This email was sent because someone (claiming to be you) submitted a Say Hey form at vibinpsybin.band/contact. If this wasn't you, please reply to let Joe know — your email may have been spoofed.`,
   ].filter(Boolean).join("\n");
+
+  // De-dupe in case submitter == RESEND_TO_ADDRESS.
+  const recipients = Array.from(new Set([to, email]));
 
   // --- Primary: Resend ---
   let resendId: string | undefined;
@@ -87,7 +163,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       },
       body: JSON.stringify({
         from,
-        to: [to],
+        to: recipients,
         reply_to: email,
         subject,
         text: textBody,
@@ -111,6 +187,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     email,
     kind: kind || null,
     len: message.length,
+    recipients,
     resendId: resendId || null,
   });
 

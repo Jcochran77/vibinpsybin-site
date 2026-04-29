@@ -8,6 +8,11 @@ import outdoorPhoto from "../assets/photos/outdoor-purple.jpg";
 const re = Astro.url.searchParams.get("re");
 const initialMessage = re ? `Re: ${re}\n\n` : "";
 const initialKind = re ? "song-feedback" : "hello";
+
+// Cloudflare Turnstile site key. Public — safe to expose at build time.
+// If unset (dev/preview without keys), the widget is omitted and the
+// server-side handler falls back to its graceful skip path.
+const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
 ---
 
 <BaseLayout
@@ -69,6 +74,27 @@ const initialKind = re ? "song-feedback" : "hello";
           <span class="label-text">What&rsquo;s on your mind?</span>
           <textarea name="message" rows="7" required placeholder="..." set:html={initialMessage}></textarea>
         </label>
+
+        {/* Honeypot field — hidden from humans, irresistible to spam bots.
+            If anything ends up in here on submit, the server silently 200s
+            without delivering. Belt-and-suspenders hiding: CSS class +
+            inline display:none + aria-hidden + tabindex=-1 + autocomplete=off. */}
+        <div class="hp-field" aria-hidden="true">
+          <label>
+            Website (leave blank)
+            <input
+              type="text"
+              name="website"
+              tabindex="-1"
+              autocomplete="off"
+              aria-hidden="true"
+            />
+          </label>
+        </div>
+
+        {turnstileSiteKey && (
+          <div class="cf-turnstile" data-sitekey={turnstileSiteKey} data-theme="dark"></div>
+        )}
 
         <button type="submit" class="btn btn-solid">Send it</button>
         <p class="form-msg" id="form-msg" aria-live="polite"></p>
@@ -200,6 +226,19 @@ const initialKind = re ? "song-feedback" : "hello";
       margin: 0;
     }
 
+    /* Honeypot — invisible to humans, present in the DOM for bots. */
+    .hp-field {
+      position: absolute !important;
+      left: -10000px !important;
+      top: auto !important;
+      width: 1px !important;
+      height: 1px !important;
+      overflow: hidden !important;
+      display: none !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+
     .signoff {
       padding: 3rem 0 1rem;
       text-align: center;
@@ -225,12 +264,19 @@ const initialKind = re ? "song-feedback" : "hello";
     }
   </style>
 
+  {turnstileSiteKey && (
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  )}
+
   <script>
     const form = document.getElementById("contact-form") as HTMLFormElement | null;
     const msg = document.getElementById("form-msg");
     if (form && msg) {
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
+        // FormData picks up the Turnstile widget's auto-injected
+        // hidden input named `cf-turnstile-response`, so the JSON body
+        // includes it without us having to thread it manually.
         const fd = new FormData(form);
         msg.textContent = "Sending...";
         try {
@@ -242,6 +288,17 @@ const initialKind = re ? "song-feedback" : "hello";
           if (res.ok) {
             msg.textContent = "🎸 Got it — talk soon.";
             form.reset();
+            // Reset Turnstile so the next submit gets a fresh token.
+            const turnstile = (window as any).turnstile;
+            if (turnstile && typeof turnstile.reset === "function") {
+              try { turnstile.reset(); } catch {}
+            }
+          } else if (res.status === 403) {
+            msg.textContent = "Verification failed. Please try again.";
+            const turnstile = (window as any).turnstile;
+            if (turnstile && typeof turnstile.reset === "function") {
+              try { turnstile.reset(); } catch {}
+            }
           } else {
             msg.textContent = "Something went wrong. Try again?";
           }
