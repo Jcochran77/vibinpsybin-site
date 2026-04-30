@@ -1,0 +1,376 @@
+---
+import { Image } from "astro:assets";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { fetchShows } from "../lib/bandsintown";
+import { fetchSpotifyReleases } from "../lib/spotify";
+import circleLogo from "../assets/logos/vpsb-circle-logo.png";
+
+// Pull live data so links update themselves.
+const [upcomingShows, releases] = await Promise.all([
+  fetchShows("upcoming"),
+  fetchSpotifyReleases(),
+]);
+const nextShow = upcomingShows[0];
+const latestRelease = releases[0];
+
+function showDateShort(iso: string) {
+  const d = new Date(iso);
+  return d.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
+}
+
+// Spotify artist URLs (both projects).
+const SPOTIFY_BAND = "https://open.spotify.com/artist/16AgfIKYaZe0mmiAHuzVta";
+const APPLE_BAND =
+  "https://music.apple.com/us/artist/vibin-psybin-and-the-sunlight-band/1696194619";
+const YOUTUBE_BAND =
+  "https://www.youtube.com/@vibinpsybinandthesunlightband";
+// Bandcamp — placeholder. Update when Bandcamp page is live.
+const BANDCAMP_BAND: string | null = null;
+---
+
+<BaseLayout
+  title="Links — Vibin' Psybin and the Sunlight Band"
+  description="Where to find us. Music, videos, shows, merch, and the email list — all in one place."
+>
+  <section class="links-page">
+    <div class="wrap-narrow center">
+      <Image
+        src={circleLogo}
+        alt=""
+        widths={[120, 200]}
+        sizes="120px"
+        class="links-mark"
+      />
+      <h1 class="links-title">Vibin' Psybin<br />&amp; the Sunlight Band</h1>
+      <p class="links-sub">Nashville psychedelic blues + indie rock</p>
+
+      <ul class="link-list" role="list">
+        {/* Featured: Subscribe — top spot, emphasized. */}
+        <li>
+          <a href="/subscribe" class="link-card link-card-featured">
+            <span class="link-icon" aria-hidden="true">✉</span>
+            <span class="link-body">
+              <span class="link-label">Get the email</span>
+              <span class="link-sub">New music + shows, no algorithm</span>
+            </span>
+            <span class="link-arrow" aria-hidden="true">→</span>
+          </a>
+        </li>
+
+        {/* Latest release. */}
+        {latestRelease && (
+          <li>
+            <a href="/music" class="link-card">
+              <span class="link-icon" aria-hidden="true">♪</span>
+              <span class="link-body">
+                <span class="link-label">Latest: {latestRelease.title}</span>
+                <span class="link-sub">All streaming platforms</span>
+              </span>
+              <span class="link-arrow" aria-hidden="true">→</span>
+            </a>
+          </li>
+        )}
+
+        {/* Next show. */}
+        {nextShow && (
+          <li>
+            <a href="/shows" class="link-card">
+              <span class="link-icon" aria-hidden="true">◉</span>
+              <span class="link-body">
+                <span class="link-label">
+                  Next show: {showDateShort(nextShow.datetime)}
+                </span>
+                <span class="link-sub">
+                  {nextShow.venue.city}{nextShow.venue.region ? `, ${nextShow.venue.region}` : ""}
+                </span>
+              </span>
+              <span class="link-arrow" aria-hidden="true">→</span>
+            </a>
+          </li>
+        )}
+
+        {/* Site sections. */}
+        <li>
+          <a href="/music" class="link-card">
+            <span class="link-icon" aria-hidden="true">▶</span>
+            <span class="link-body">
+              <span class="link-label">Music</span>
+              <span class="link-sub">Full discography</span>
+            </span>
+            <span class="link-arrow" aria-hidden="true">→</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="/videos" class="link-card">
+            <span class="link-icon" aria-hidden="true">◇</span>
+            <span class="link-body">
+              <span class="link-label">Videos</span>
+              <span class="link-sub">Music videos &amp; live cuts</span>
+            </span>
+            <span class="link-arrow" aria-hidden="true">→</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="/shows" class="link-card">
+            <span class="link-icon" aria-hidden="true">⌖</span>
+            <span class="link-body">
+              <span class="link-label">All shows</span>
+              <span class="link-sub">Upcoming &amp; past</span>
+            </span>
+            <span class="link-arrow" aria-hidden="true">→</span>
+          </a>
+        </li>
+
+        {/* External streaming. */}
+        <li>
+          <a href={SPOTIFY_BAND} class="link-card" target="_blank" rel="noopener">
+            <span class="link-icon" aria-hidden="true">⌘</span>
+            <span class="link-body">
+              <span class="link-label">Spotify</span>
+              <span class="link-sub">Follow the artist page</span>
+            </span>
+            <span class="link-arrow" aria-hidden="true">↗</span>
+          </a>
+        </li>
+
+        <li>
+          <a href={APPLE_BAND} class="link-card" target="_blank" rel="noopener">
+            <span class="link-icon" aria-hidden="true">⌘</span>
+            <span class="link-body">
+              <span class="link-label">Apple Music</span>
+              <span class="link-sub">Listen on Apple</span>
+            </span>
+            <span class="link-arrow" aria-hidden="true">↗</span>
+          </a>
+        </li>
+
+        <li>
+          <a href={YOUTUBE_BAND} class="link-card" target="_blank" rel="noopener">
+            <span class="link-icon" aria-hidden="true">▷</span>
+            <span class="link-body">
+              <span class="link-label">YouTube</span>
+              <span class="link-sub">Music videos &amp; live</span>
+            </span>
+            <span class="link-arrow" aria-hidden="true">↗</span>
+          </a>
+        </li>
+
+        {BANDCAMP_BAND && (
+          <li>
+            <a href={BANDCAMP_BAND} class="link-card" target="_blank" rel="noopener">
+              <span class="link-icon" aria-hidden="true">⊞</span>
+              <span class="link-body">
+                <span class="link-label">Bandcamp</span>
+                <span class="link-sub">Buy CDs, vinyl, downloads</span>
+              </span>
+              <span class="link-arrow" aria-hidden="true">↗</span>
+            </a>
+          </li>
+        )}
+
+        <li>
+          <a href="/contact" class="link-card">
+            <span class="link-icon" aria-hidden="true">✎</span>
+            <span class="link-body">
+              <span class="link-label">Say hey</span>
+              <span class="link-sub">Drop us a line</span>
+            </span>
+            <span class="link-arrow" aria-hidden="true">→</span>
+          </a>
+        </li>
+      </ul>
+
+      <p class="links-mantra">
+        <span>No tracking.</span> <span>No ads.</span> <span>No algorithm.</span>
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .links-page {
+    padding: clamp(2.5rem, 6vw, 4.5rem) 1.25rem clamp(3rem, 8vw, 5rem);
+    min-height: 70vh;
+  }
+
+  .center {
+    text-align: center;
+  }
+
+  .links-mark {
+    width: 96px;
+    height: auto;
+    margin: 0 auto 1.25rem;
+    display: block;
+    opacity: 0.95;
+  }
+
+  .links-title {
+    font-family: "DM Serif Display", serif;
+    font-size: clamp(2rem, 5vw, 2.75rem);
+    line-height: 1.05;
+    margin: 0 0 0.5rem;
+    color: var(--ink, #f5ecd0);
+  }
+
+  .links-sub {
+    font-family: "Inter", system-ui, sans-serif;
+    font-size: 0.95rem;
+    color: var(--ink-muted, #c8b88a);
+    letter-spacing: 0.04em;
+    margin: 0 0 2rem;
+    text-transform: uppercase;
+  }
+
+  .link-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    max-width: 520px;
+    margin-inline: auto;
+  }
+
+  .link-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.1rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(245, 236, 208, 0.16);
+    border-radius: 14px;
+    color: var(--ink, #f5ecd0);
+    text-decoration: none;
+    transition:
+      transform 0.18s ease,
+      background 0.18s ease,
+      border-color 0.18s ease;
+    text-align: left;
+  }
+
+  .link-card:hover,
+  .link-card:focus-visible {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(245, 236, 208, 0.32);
+    transform: translateY(-1px);
+    outline: none;
+  }
+
+  .link-card-featured {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 154, 60, 0.18),
+      rgba(208, 80, 158, 0.18)
+    );
+    border-color: rgba(255, 154, 60, 0.55);
+  }
+
+  .link-card-featured:hover,
+  .link-card-featured:focus-visible {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 154, 60, 0.28),
+      rgba(208, 80, 158, 0.28)
+    );
+    border-color: rgba(255, 154, 60, 0.85);
+  }
+
+  .link-icon {
+    flex: 0 0 38px;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    background: rgba(245, 236, 208, 0.08);
+    color: var(--ink, #f5ecd0);
+  }
+
+  .link-card-featured .link-icon {
+    background: rgba(255, 255, 255, 0.18);
+  }
+
+  .link-body {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+  }
+
+  .link-label {
+    font-family: "Inter", system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--ink, #f5ecd0);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .link-sub {
+    font-family: "Inter", system-ui, sans-serif;
+    font-size: 0.82rem;
+    color: var(--ink-muted, #c8b88a);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .link-arrow {
+    flex: 0 0 auto;
+    font-size: 1rem;
+    color: var(--ink-muted, #c8b88a);
+    transition: transform 0.18s ease;
+  }
+
+  .link-card:hover .link-arrow,
+  .link-card:focus-visible .link-arrow {
+    transform: translateX(3px);
+    color: var(--ink, #f5ecd0);
+  }
+
+  .links-mantra {
+    margin: 2.25rem 0 0;
+    font-family: "Inter", system-ui, sans-serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-muted, #c8b88a);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    justify-content: center;
+  }
+
+  .links-mantra span {
+    opacity: 0.8;
+  }
+
+  @media (max-width: 480px) {
+    .link-card {
+      padding: 0.85rem 0.95rem;
+      gap: 0.85rem;
+    }
+    .link-icon {
+      flex: 0 0 34px;
+      width: 34px;
+      height: 34px;
+    }
+    .link-label {
+      font-size: 0.95rem;
+    }
+    .link-sub {
+      font-size: 0.78rem;
+    }
+  }
+</style>
