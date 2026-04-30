@@ -1,0 +1,359 @@
+---
+import { Image } from "astro:assets";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { fetchShows } from "../lib/bandsintown";
+import { fetchSpotifyReleases } from "../lib/spotify";
+import circleLogo from "../assets/logos/vpsb-circle-logo.png";
+
+// Pull live data so links update themselves over time.
+const [upcomingShows, releases] = await Promise.all([
+  fetchShows("upcoming"),
+  fetchSpotifyReleases(),
+]);
+const nextShow = upcomingShows[0];
+const latestRelease = releases[0];
+
+function showDateShort(iso: string) {
+  const d = new Date(iso);
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
+// External destinations.
+const SPOTIFY_BAND = "https://open.spotify.com/artist/16AgfIKYaZe0mmiAHuzVta";
+const APPLE_BAND =
+  "https://music.apple.com/us/artist/vibin-psybin-and-the-sunlight-band/1696194619";
+const YOUTUBE_BAND =
+  "https://www.youtube.com/@vibinpsybinandthesunlightband";
+// Bandcamp slot — flip to URL string when Joe's Bandcamp is live.
+const BANDCAMP_BAND: string | null = null;
+---
+
+<BaseLayout
+  title="Links — Vibin' Psybin and the Sunlight Band"
+  description="Where to find us. Music, videos, shows, the email list — all in one place."
+>
+  <section class="band page-hero links-hero">
+    <div class="wrap-narrow">
+      <Image
+        src={circleLogo}
+        alt=""
+        widths={[120, 200]}
+        sizes="100px"
+        class="mark"
+      />
+      <p class="eyebrow">Where to find us</p>
+      <h1>Vibin' Psybin<br />&amp; the Sunlight Band</h1>
+      <p class="lead muted">Nashville psychedelic blues + indie rock</p>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap-narrow">
+
+      <!-- FEATURED: Subscribe -->
+      <a href="/subscribe" class="featured-link">
+        <div class="featured-link-body">
+          <p class="eyebrow">Featured</p>
+          <h2>Get the email</h2>
+          <p class="muted">New music, new shows, no algorithm. One email, only when it matters.</p>
+        </div>
+        <div class="featured-link-arrow" aria-hidden="true">→</div>
+      </a>
+
+      <!-- LINK LIST -->
+      <ul class="link-list" role="list">
+
+        {/* Latest release */}
+        {latestRelease && (
+          <li class="link-row">
+            <a href="/music" class="link-row-link">
+              <div class="link-row-text">
+                <p class="link-eyebrow">Latest release</p>
+                <p class="link-title">{latestRelease.title}</p>
+                <p class="link-sub">All streaming platforms</p>
+              </div>
+              <span class="link-arrow" aria-hidden="true">→</span>
+            </a>
+          </li>
+        )}
+
+        {/* Next show — keep the row compact (venue strings can be noisy from Bandsintown) */}
+        {nextShow && (
+          <li class="link-row">
+            <a href="/shows" class="link-row-link">
+              <div class="link-row-text">
+                <p class="link-eyebrow">Upcoming show</p>
+                <p class="link-title">{showDateShort(nextShow.datetime)} · {nextShow.city}</p>
+                <p class="link-sub">All upcoming dates</p>
+              </div>
+              <span class="link-arrow" aria-hidden="true">→</span>
+            </a>
+          </li>
+        )}
+
+        {/* Internal site sections */}
+        <li class="link-row">
+          <a href="/music" class="link-row-link">
+            <div class="link-row-text">
+              <p class="link-eyebrow">On site</p>
+              <p class="link-title">Music</p>
+              <p class="link-sub">Full discography</p>
+            </div>
+            <span class="link-arrow" aria-hidden="true">→</span>
+          </a>
+        </li>
+
+        <li class="link-row">
+          <a href="/videos" class="link-row-link">
+            <div class="link-row-text">
+              <p class="link-eyebrow">On site</p>
+              <p class="link-title">Videos</p>
+              <p class="link-sub">Music videos &amp; live cuts</p>
+            </div>
+            <span class="link-arrow" aria-hidden="true">→</span>
+          </a>
+        </li>
+
+        <li class="link-row">
+          <a href="/manifesto" class="link-row-link">
+            <div class="link-row-text">
+              <p class="link-eyebrow">On site</p>
+              <p class="link-title">Manifesto</p>
+              <p class="link-sub">Why this site has no feed</p>
+            </div>
+            <span class="link-arrow" aria-hidden="true">→</span>
+          </a>
+        </li>
+
+        {/* External streaming */}
+        <li class="link-row">
+          <a href={SPOTIFY_BAND} class="link-row-link" target="_blank" rel="noopener">
+            <div class="link-row-text">
+              <p class="link-eyebrow">Streaming</p>
+              <p class="link-title">Spotify</p>
+              <p class="link-sub">Follow the artist page</p>
+            </div>
+            <span class="link-arrow" aria-hidden="true">↗</span>
+          </a>
+        </li>
+
+        <li class="link-row">
+          <a href={APPLE_BAND} class="link-row-link" target="_blank" rel="noopener">
+            <div class="link-row-text">
+              <p class="link-eyebrow">Streaming</p>
+              <p class="link-title">Apple Music</p>
+              <p class="link-sub">Listen on Apple</p>
+            </div>
+            <span class="link-arrow" aria-hidden="true">↗</span>
+          </a>
+        </li>
+
+        <li class="link-row">
+          <a href={YOUTUBE_BAND} class="link-row-link" target="_blank" rel="noopener">
+            <div class="link-row-text">
+              <p class="link-eyebrow">Streaming</p>
+              <p class="link-title">YouTube</p>
+              <p class="link-sub">Music videos &amp; live</p>
+            </div>
+            <span class="link-arrow" aria-hidden="true">↗</span>
+          </a>
+        </li>
+
+        {BANDCAMP_BAND && (
+          <li class="link-row">
+            <a href={BANDCAMP_BAND} class="link-row-link" target="_blank" rel="noopener">
+              <div class="link-row-text">
+                <p class="link-eyebrow">Buy direct</p>
+                <p class="link-title">Bandcamp</p>
+                <p class="link-sub">CDs, vinyl, downloads</p>
+              </div>
+              <span class="link-arrow" aria-hidden="true">↗</span>
+            </a>
+          </li>
+        )}
+
+        {/* Contact */}
+        <li class="link-row">
+          <a href="/contact" class="link-row-link">
+            <div class="link-row-text">
+              <p class="link-eyebrow">Talk to us</p>
+              <p class="link-title">Say hey</p>
+              <p class="link-sub">Drop a line</p>
+            </div>
+            <span class="link-arrow" aria-hidden="true">→</span>
+          </a>
+        </li>
+
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .links-hero {
+    padding: 4rem 0 2rem;
+    text-align: center;
+  }
+  .links-hero .mark {
+    width: 100px;
+    height: auto;
+    filter: invert(1) brightness(0.95);
+    opacity: 0.85;
+    margin: 0 auto 1.5rem;
+    display: block;
+  }
+  .links-hero h1 {
+    font-family: var(--font-serif);
+    font-size: clamp(2rem, 5vw, 3rem);
+    line-height: 1.05;
+    margin: 0.5rem auto 0.75rem;
+  }
+  .links-hero .lead {
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin: 0 auto;
+  }
+
+  /* Featured (Subscribe) — mirrors the homepage Next Show card */
+  .featured-link {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1.5rem;
+    align-items: center;
+    padding: 2rem 1.75rem;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--bg-alt);
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+    margin: 0 0 2.5rem;
+  }
+  .featured-link::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 85% 30%, rgba(255,62,136,0.10), transparent 55%),
+      radial-gradient(circle at 15% 80%, rgba(78,205,255,0.08), transparent 55%);
+    pointer-events: none;
+    border-radius: 4px;
+  }
+  .featured-link::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--magenta), var(--violet), var(--electric));
+    opacity: 0.85;
+  }
+  .featured-link > * { position: relative; z-index: 1; }
+  .featured-link:hover,
+  .featured-link:focus-visible {
+    border-color: var(--accent);
+    transform: translateY(-1px);
+    outline: none;
+  }
+  .featured-link h2 {
+    font-family: var(--font-serif);
+    font-size: clamp(1.6rem, 3.5vw, 2.1rem);
+    margin: 0.25rem 0 0.5rem;
+    color: var(--fg);
+  }
+  .featured-link .muted {
+    margin: 0;
+    font-size: 1rem;
+  }
+  .featured-link-arrow {
+    font-size: 2rem;
+    color: var(--accent-2);
+    line-height: 1;
+    transition: transform 0.2s ease, color 0.2s ease;
+  }
+  .featured-link:hover .featured-link-arrow {
+    transform: translateX(4px);
+    color: var(--accent);
+  }
+
+  /* Link list — mirrors the Shows page row pattern */
+  .link-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 2rem;
+  }
+  .link-row {
+    border-top: 1px solid var(--line);
+  }
+  .link-row:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+  .link-row-link {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
+    align-items: center;
+    padding: 1.5rem 0.5rem;
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.2s ease;
+  }
+  .link-row-link:hover,
+  .link-row-link:focus-visible {
+    background: linear-gradient(90deg, transparent, rgba(78,205,196,0.04), transparent);
+    outline: none;
+  }
+  .link-row-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+  }
+  .link-eyebrow {
+    font-family: var(--font-sans);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent-2);
+    margin: 0;
+  }
+  .link-title {
+    font-family: var(--font-serif);
+    font-size: 1.4rem;
+    line-height: 1.2;
+    color: var(--fg);
+    margin: 0;
+  }
+  .link-sub {
+    font-family: var(--font-sans);
+    font-size: 0.92rem;
+    color: var(--fg-muted);
+    margin: 0;
+  }
+  .link-arrow {
+    font-size: 1.4rem;
+    color: var(--fg-muted);
+    transition: transform 0.2s ease, color 0.2s ease;
+    padding-right: 0.25rem;
+  }
+  .link-row-link:hover .link-arrow,
+  .link-row-link:focus-visible .link-arrow {
+    transform: translateX(3px);
+    color: var(--accent);
+  }
+
+  @media (max-width: 480px) {
+    .featured-link {
+      padding: 1.5rem 1.25rem;
+    }
+    .link-row-link {
+      padding: 1.25rem 0.25rem;
+    }
+    .link-title {
+      font-size: 1.2rem;
+    }
+  }
+</style>
