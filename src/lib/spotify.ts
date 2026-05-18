@@ -19,6 +19,7 @@ import { dirname, resolve } from "node:path";
 
 import fallbackReleases from "../data/releases.json";
 import releaseOverrides from "../data/release-overrides.json";
+import manualReleasesData from "../data/manual-releases.json";
 import {
   fetchPlatformLinks,
   getCachedPlatformLinks,
@@ -161,8 +162,14 @@ const HIDDEN_ALBUM_IDS: ReadonlySet<string> = new Set([
   "5eocqaLyIyfEsou3RR3S1e", // Good Time Girls (2024-04-12) — rolled into Hippie Cowboy
   "5HmfzolN3eqSUB9wLodgFb", // Because You Said So (2024-05-24) — rolled into Hippie Cowboy
   "2cSlJc8Fz5zdIY0Im5rDjo", // Songbird (2024-07-19) — rolled into Hippie Cowboy
-  "7zlkcsMJBLcCx97tPRr8YW", // Po-Dunk Baby (2025-05-23) — rolled into To The Wind
-  "4pcZ5EAZ3jqgMzsf0rRXjX", // Let Me Loose (2025-06-27) — rolled into To The Wind
+  // Reflections album (Bandcamp only, no Spotify entry yet) supersedes
+  // every Sunlight Band single released between May 2025 and Apr 2026.
+  // Added as a manual release in src/data/manual-releases.json.
+  "7zlkcsMJBLcCx97tPRr8YW", // Po-Dunk Baby (2025-05-23) — rolled into Reflections
+  "4pcZ5EAZ3jqgMzsf0rRXjX", // Let Me Loose (2025-06-27) — rolled into Reflections
+  "7MUINpHacoQUNSL2itIvQq", // To The Wind (2025-07-25) — rolled into Reflections
+  "3bonyNNLXkwF8wnJR3wJza", // Get Over Get On / Reflections (2025-08-29) — rolled into Reflections
+  "372PbPefzKQ2XOEO5miRJy", // The Ride (2026-04-24) — rolled into Reflections
 ]);
 
 const API_BASE = "https://api.spotify.com/v1";
@@ -208,6 +215,41 @@ function getOverride(albumId: string): ReleaseOverrideEntry | null {
   const raw = (releaseOverrides as Record<string, unknown>)[albumId];
   if (!raw || typeof raw !== "object") return null;
   return raw as ReleaseOverrideEntry;
+}
+
+// --- Manual releases (Bandcamp-only / non-Spotify) ---
+//
+// Some records exist on Bandcamp before they're on streaming (e.g. albums Joe
+// wants to ship to fans directly first). We merge them into the
+// Spotify-fetched discography so they render alongside everything else on
+// /music and the homepage. Defined in src/data/manual-releases.json.
+//
+// We deliberately do NOT call Odesli for these — there's no Spotify URL to
+// resolve from, so platformLinks stays null and the UI falls back to just the
+// Bandcamp link in the dropdown.
+interface ManualReleasesFile {
+  releases?: Array<Partial<NormalizedRelease> & { id: string; title: string }>;
+}
+
+function loadManualReleases(): NormalizedRelease[] {
+  const data = manualReleasesData as ManualReleasesFile;
+  const list = Array.isArray(data?.releases) ? data.releases : [];
+  return list.map((r) => ({
+    id: r.id,
+    title: r.title,
+    artist: r.artist ?? "",
+    year: typeof r.year === "number" ? r.year : 0,
+    type: (["album", "single", "ep", "compilation"].includes(r.type as string)
+      ? r.type
+      : "album") as ReleaseType,
+    coverUrl: r.coverUrl ?? null,
+    spotifyUrl: r.spotifyUrl ?? null,
+    trackNames: Array.isArray(r.trackNames) ? r.trackNames : [],
+    releaseDate: r.releaseDate ?? `${r.year ?? 0}-01-01`,
+    notes: r.notes ?? undefined,
+    platformLinks: null,
+    bandcampUrl: r.bandcampUrl ?? null,
+  }));
 }
 
 // --- Spotify response types (partial) ---
@@ -613,7 +655,17 @@ async function fetchSpotifyReleasesUncached(): Promise<NormalizedRelease[]> {
       return true;
     });
 
-    const sorted = sortNewestFirst(visible);
+    // Merge in manual (Bandcamp-only / non-Spotify) releases. These have no
+    // Spotify URL, so the Odesli loop below skips them and the renderer falls
+    // back to just the Bandcamp link. If a manual release ever lands on
+    // Spotify later, Spotify-side will be deduped via title+year matching.
+    const manual = loadManualReleases();
+    if (manual.length > 0) {
+      console.log(`[spotify] merging ${manual.length} manual release(s) into discography`);
+    }
+    const merged = dedupe([...visible, ...manual]);
+
+    const sorted = sortNewestFirst(merged);
     if (sorted.length === 0) {
       return fallbackChain("returned zero releases after dedupe");
     }

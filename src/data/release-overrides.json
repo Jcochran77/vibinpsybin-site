@@ -1,3 +1,5 @@
 {
-  "_comment": "Per-release overrides keyed by Spotify album id. Shape: { '<spotifyAlbumId>': { 'bandcampUrl'?: string } }. Joe will populate as Bandcamp uploads catch up. Example: \"372PbPefzKQ2XOEO5miRJy\": { \"bandcampUrl\": \"https://vibinpsybin.bandcamp.com/album/the-ride\" }"
+  "_comment": "Per-release overrides keyed by Spotify album id. Shape: { '<spotifyAlbumId>': { 'bandcampUrl'?: string } }. Used for releases that ARE on Spotify and need a Bandcamp link attached. Bandcamp-only releases live in manual-releases.json instead.",
+
+  "1s8KdPMs8lJfTT7MuZlCN9": { "bandcampUrl": "https://vibinpsybinandthesunlightband.bandcamp.com/album/hippie-cowboy" }
 }
