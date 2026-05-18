@@ -36,7 +36,7 @@ const DEFAULT_FROM = "Vibin' Psybin <onboarding@resend.dev>";
 const DEFAULT_TO = "vibinpsybin@gmail.com";
 const RESEND_TIMEOUT_MS = 8_000;
 
-export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
+export const onRequestPost: PagesFunction<Env> = async ({ request, env, waitUntil }) => {
   const json = (body: unknown, status = 200) =>
     new Response(JSON.stringify(body), {
       status,
@@ -84,23 +84,40 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       email,
       detail: audienceResult.detail,
     });
-    await emailJoeFallback(env, email, audienceResult.detail).catch((e) => {
-      console.error("[subscribe] fallback email also failed", {
-        email,
-        emailError: e instanceof Error ? e.message : String(e),
-      });
-    });
+    const fallbackTask = emailJoeFallback(env, email, audienceResult.detail).catch(
+      (e) => {
+        console.error("[subscribe] fallback email also failed", {
+          email,
+          emailError: e instanceof Error ? e.message : String(e),
+        });
+      },
+    );
+    if (waitUntil) {
+      waitUntil(fallbackTask);
+    } else {
+      await fallbackTask;
+    }
     return json({ ok: true });
   }
 
   // --- 3. Send welcome email (best-effort, don't block the user) ---
+  // Use waitUntil so the email send completes even after we've returned the
+  // response to the user. Without it, Pages Functions kill the in-flight
+  // fetch as soon as the response is sent and the welcome never delivers.
   if (audienceResult.isNew) {
-    sendWelcomeEmail(env, email).catch((e) => {
+    const sendTask = sendWelcomeEmail(env, email).catch((e) => {
       console.error("[subscribe] welcome email send failed", {
         email,
         error: e instanceof Error ? e.message : String(e),
       });
     });
+    if (waitUntil) {
+      waitUntil(sendTask);
+    } else {
+      // Synchronously await as a fallback (older runtimes); slows the user
+      // response by ~150-400ms but guarantees the email goes out.
+      await sendTask;
+    }
   } else {
     console.log("[subscribe] existing contact, skipping welcome email", {
       email,
