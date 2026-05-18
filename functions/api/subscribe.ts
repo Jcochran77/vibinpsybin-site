@@ -26,7 +26,12 @@ interface Env {
   RESEND_AUDIENCE_ID: string;
   RESEND_FROM_ADDRESS?: string;
   RESEND_TO_ADDRESS?: string;
+  // Required for signing unsubscribe links so randos can't unsubscribe each
+  // other. See functions/api/unsubscribe.ts for the matching verifier.
+  UNSUBSCRIBE_SECRET?: string;
 }
+
+const SITE_ORIGIN = "https://vibinpsybin.band";
 
 // Until vibinpsybin.band is verified in Resend, use the shared sender.
 // Once verified, set RESEND_FROM_ADDRESS=hello@vibinpsybin.band (or similar)
@@ -199,11 +204,53 @@ async function addToResendAudience(
   }
 }
 
+// ---- Unsubscribe link signing ----
+
+async function hmacSha256Hex(secret: string, message: string): Promise<string> {
+  const enc = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    "raw",
+    enc.encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  const sig = await crypto.subtle.sign("HMAC", key, enc.encode(message));
+  return Array.from(new Uint8Array(sig))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+async function buildUnsubscribeUrls(
+  email: string,
+  secret: string,
+): Promise<{ link: string; postUrl: string }> {
+  const token = await hmacSha256Hex(secret, email);
+  const qs = `email=${encodeURIComponent(email)}&token=${token}`;
+  return {
+    link: `${SITE_ORIGIN}/api/unsubscribe?${qs}`,
+    postUrl: `${SITE_ORIGIN}/api/unsubscribe?${qs}`,
+  };
+}
+
 // ---- Welcome email ----
 
 async function sendWelcomeEmail(env: Env, email: string): Promise<void> {
   const from = env.RESEND_FROM_ADDRESS || DEFAULT_FROM;
   const subject = "🎸 You're on the list — Vibin' Psybin";
+
+  // Build the signed unsubscribe URLs. If we don't have a secret configured
+  // we still send the email but without unsubscribe handling — the user can
+  // always reply or use /contact. (Should never happen in prod; env is set.)
+  let unsubLink: string | null = null;
+  let unsubPostUrl: string | null = null;
+  if (env.UNSUBSCRIBE_SECRET) {
+    const urls = await buildUnsubscribeUrls(email, env.UNSUBSCRIBE_SECRET);
+    unsubLink = urls.link;
+    unsubPostUrl = urls.postUrl;
+  } else {
+    console.warn("[subscribe] UNSUBSCRIBE_SECRET missing; sending without unsubscribe headers");
+  }
 
   const text = [
     `Hey,`,
@@ -224,7 +271,19 @@ async function sendWelcomeEmail(env: Env, email: string): Promise<void> {
     `— Joe`,
     `   Vibin' Psybin and the Sunlight Band`,
     `   https://vibinpsybin.band`,
+    ...(unsubLink
+      ? [``, `———`, `Don't want emails like this? Unsubscribe here: ${unsubLink}`]
+      : []),
   ].join("\n");
+
+  const unsubFooterHtml = unsubLink
+    ? `<hr style="border: none; border-top: 1px solid #e5e5e5; margin: 32px 0 16px;">
+      <p style="font-size: 0.85rem; color: #888; line-height: 1.5;">
+        Don&rsquo;t want emails like this?
+        <a href="${unsubLink}" style="color: #888; text-decoration: underline;">Unsubscribe</a>.
+        No hard feelings.
+      </p>`
+    : "";
 
   const html = `<!doctype html>
 <html>
@@ -239,8 +298,18 @@ async function sendWelcomeEmail(env: Env, email: string): Promise<void> {
       <span style="color: #666;">Vibin&rsquo; Psybin and the Sunlight Band</span><br>
       <a href="https://vibinpsybin.band" style="color: #b8860b;">vibinpsybin.band</a>
     </p>
+    ${unsubFooterHtml}
   </body>
 </html>`;
+
+  // RFC 8058 / Gmail+Yahoo bulk-sender requirement: include both headers
+  // so mail clients can render a native "Unsubscribe" button at the top of
+  // the message and process clicks with a single POST.
+  const headers: Record<string, string> = {};
+  if (unsubLink && unsubPostUrl) {
+    headers["List-Unsubscribe"] = `<${unsubPostUrl}>, <mailto:${env.RESEND_TO_ADDRESS || DEFAULT_TO}?subject=unsubscribe>`;
+    headers["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click";
+  }
 
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -256,6 +325,7 @@ async function sendWelcomeEmail(env: Env, email: string): Promise<void> {
       html,
       // Replies should land in Joe's inbox so fans can write back.
       reply_to: env.RESEND_TO_ADDRESS || DEFAULT_TO,
+      ...(Object.keys(headers).length ? { headers } : {}),
     }),
   });
   if (!res.ok) {
