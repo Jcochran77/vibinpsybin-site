@@ -1,0 +1,85 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+// /unsubscribed — the friendly landing page after a user clicks the
+// unsubscribe link in an email. The actual unsubscribe is handled by
+// /api/unsubscribe; this page just confirms it and offers a way back.
+//
+// Query params:
+//   ok=1     successful unsubscribe (or already-unsubscribed)
+//   ok=0     bad/missing token (don't tell the user which)
+//   email=…  the unsubscribed address (only set when ok=1)
+const ok = Astro.url.searchParams.get("ok") === "1";
+const email = (Astro.url.searchParams.get("email") || "").trim();
+---
+
+<BaseLayout
+  title={
+    ok
+      ? "You're out — Vibin' Psybin"
+      : "Something went sideways — Vibin' Psybin"
+  }
+  description={
+    ok
+      ? "You've been removed from the email list."
+      : "We couldn't process that unsubscribe link."
+  }
+>
+  <section class="band page-hero">
+    <div class="wrap-narrow">
+      {
+        ok ? (
+          <>
+            <p class="eyebrow">All done 🫡</p>
+            <h1>You're out.</h1>
+            <p class="lead">
+              {email
+                ? `${email} has been removed from the email list.`
+                : `You've been removed from the email list.`}
+              No hard feelings &mdash; happens to all of us. Inbox space is sacred.
+            </p>
+            <p>
+              If you change your mind, you can <a href="/subscribe">jump back on the list</a> any
+              time. The music keeps coming either way &mdash; you can also find me on
+              <a href="/music">streaming</a>.
+            </p>
+            <p style="margin-top:2rem;">
+              <a class="btn btn-solid" href="/">Back to the music</a>
+            </p>
+          </>
+        ) : (
+          <>
+            <p class="eyebrow">Hmm.</p>
+            <h1>That link didn't work.</h1>
+            <p class="lead">
+              The unsubscribe link in your email is either expired, mangled, or
+              not one I issued. If you want off the list, the simplest thing is
+              to <a href="/contact">drop me a line</a> and I'll yank you off
+              manually &mdash; I read every email.
+            </p>
+            <p style="margin-top:2rem;">
+              <a class="btn btn-solid" href="/contact">Email me directly</a>
+            </p>
+          </>
+        )
+      }
+    </div>
+  </section>
+
+  <style>
+    .page-hero {
+      padding: 4rem 0;
+      text-align: center;
+    }
+    .lead {
+      font-size: 1.1rem;
+      max-width: 42rem;
+      margin: 0.5rem auto 1.5rem;
+    }
+    p a {
+      color: var(--accent);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+  </style>
+</BaseLayout>
