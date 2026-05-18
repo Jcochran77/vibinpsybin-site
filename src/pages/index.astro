@@ -139,9 +139,9 @@ const eyebrowLabel = showEyebrow(nextShowDays);
           <div class="release-art">
             {latestRelease.coverUrl ? (
               <a
-                href={latestRelease.spotifyUrl ?? "/music"}
-                target={latestRelease.spotifyUrl ? "_blank" : undefined}
-                rel={latestRelease.spotifyUrl ? "noopener" : undefined}
+                href={latestRelease.spotifyUrl ?? latestRelease.bandcampUrl ?? "/music"}
+                target={(latestRelease.spotifyUrl || latestRelease.bandcampUrl) ? "_blank" : undefined}
+                rel={(latestRelease.spotifyUrl || latestRelease.bandcampUrl) ? "noopener" : undefined}
                 class="release-art-link"
               >
                 <img
@@ -165,9 +165,11 @@ const eyebrowLabel = showEyebrow(nextShowDays);
             <p class="muted">{latestRelease.artist} &middot; {latestRelease.year}</p>
             {latestRelease.notes && <p class="release-notes">{latestRelease.notes}</p>}
             <div class="release-ctas">
-              {latestRelease.spotifyUrl && (
+              {latestRelease.spotifyUrl ? (
                 <a class="btn btn-solid" href={latestRelease.spotifyUrl} target="_blank" rel="noopener">Listen on Spotify</a>
-              )}
+              ) : latestRelease.bandcampUrl ? (
+                <a class="btn btn-solid" href={latestRelease.bandcampUrl} target="_blank" rel="noopener">Listen on Bandcamp</a>
+              ) : null}
               <a class="btn" href="/music">All releases</a>
             </div>
           </div>

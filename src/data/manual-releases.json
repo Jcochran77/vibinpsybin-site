@@ -1,0 +1,29 @@
+{
+  "_comment": "Manual releases — for records that exist on Bandcamp or elsewhere but NOT on Spotify (yet). These get merged into the Spotify-fetched discography in src/lib/spotify.ts. Shape matches NormalizedRelease minus the platformLinks (which we leave null since Odesli only resolves Spotify URLs).",
+  "releases": [
+    {
+      "id": "manual-reflections-2026",
+      "title": "Reflections",
+      "artist": "Vibin' Psybin and the Sunlight Band",
+      "year": 2026,
+      "type": "album",
+      "coverUrl": "https://f4.bcbits.com/img/a2905856159_10.jpg",
+      "spotifyUrl": null,
+      "trackNames": [
+        "To The Wind",
+        "The Ride",
+        "Let Me Loose",
+        "Drugs",
+        "Get Over Get On / Reflections",
+        "Respect The Drip",
+        "Po-Dunk Baby",
+        "Falling In Falling Out",
+        "Sunny Little Cafe",
+        "The In Between"
+      ],
+      "releaseDate": "2026-05-05",
+      "bandcampUrl": "https://vibinpsybinandthesunlightband.bandcamp.com/album/reflections",
+      "notes": null
+    }
+  ]
+}
