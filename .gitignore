@@ -30,3 +30,9 @@ yarn-error.log*
 .wrangler
 .dev.vars*
 !.dev.vars.example
+
+# build-time caches (rewritten every run; not source of truth)
+.itunes-cache.json
+.releases-cache.json
+.songlink-cache.json
+
