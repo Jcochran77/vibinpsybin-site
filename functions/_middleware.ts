@@ -58,20 +58,25 @@ const BLOCK_PATTERNS: RegExp[] = [
   /\/api\/v[0-9]+\/\.env/i,
 ];
 
-const BLOCK_RESPONSE = new Response("Gone.\n", {
-  status: 410,
-  headers: {
-    "Content-Type": "text/plain; charset=utf-8",
-    "Cache-Control": "public, max-age=86400, immutable",
-    "X-Robots-Tag": "noindex, nofollow",
-  },
-});
+// Note: we build the Response inside the handler, not at module scope.
+// Cloudflare Workers disallows I/O-ish operations (including Response
+// constructor with a body) during global init.
+function goneResponse(): Response {
+  return new Response("Gone.\n", {
+    status: 410,
+    headers: {
+      "Content-Type": "text/plain; charset=utf-8",
+      "Cache-Control": "public, max-age=86400, immutable",
+      "X-Robots-Tag": "noindex, nofollow",
+    },
+  });
+}
 
 export const onRequest: PagesFunction = async (ctx) => {
   const path = new URL(ctx.request.url).pathname;
   for (const re of BLOCK_PATTERNS) {
     if (re.test(path)) {
-      return BLOCK_RESPONSE.clone();
+      return goneResponse();
     }
   }
   return ctx.next();
