@@ -170,6 +170,7 @@ const HIDDEN_ALBUM_IDS: ReadonlySet<string> = new Set([
   "7MUINpHacoQUNSL2itIvQq", // To The Wind (2025-07-25) — rolled into Reflections
   "3bonyNNLXkwF8wnJR3wJza", // Get Over Get On / Reflections (2025-08-29) — rolled into Reflections
   "372PbPefzKQ2XOEO5miRJy", // The Ride (2026-04-24) — rolled into Reflections
+  "70uVV1OQBu3JXjZS2hL5Nf", // Sunny Little Café (2026-06-26) — rolled into Reflections
 ]);
 
 const API_BASE = "https://api.spotify.com/v1";
