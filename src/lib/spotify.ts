@@ -208,6 +208,20 @@ export interface NormalizedRelease {
 
 interface ReleaseOverrideEntry {
   bandcampUrl?: string;
+  // Hardcoded platform links. Used when Odesli returns nothing (or its API
+  // is unavailable). If any of these are set they win over Odesli results.
+  // Provide the ones you have; leave the rest undefined to let Odesli fill
+  // them in when it works, or iTunes Search fill Apple Music.
+  platformLinks?: {
+    spotify?: string | null;
+    appleMusic?: string | null;
+    youtubeMusic?: string | null;
+    tidal?: string | null;
+    amazonMusic?: string | null;
+    deezer?: string | null;
+    pandora?: string | null;
+    soundcloud?: string | null;
+  };
 }
 
 function getOverride(albumId: string): ReleaseOverrideEntry | null {
@@ -699,7 +713,50 @@ async function fetchSpotifyReleasesUncached(): Promise<NormalizedRelease[]> {
         continue;
       }
       const before = Date.now();
-      r.platformLinks = await fetchPlatformLinks(r.spotifyUrl, r.title);
+      const overrideLinks = getOverride(r.id)?.platformLinks;
+      // If the override defines a link for every platform, skip Odesli
+      // entirely — no reason to hit the network (and burn our rate limit
+      // budget) when we already have the answers.
+      const overrideIsComplete =
+        overrideLinks !== undefined &&
+        [
+          "spotify",
+          "appleMusic",
+          "youtubeMusic",
+          "tidal",
+          "amazonMusic",
+          "deezer",
+          "pandora",
+          "soundcloud",
+        ].every((k) => (overrideLinks as Record<string, unknown>)[k] !== undefined);
+      const fetched = overrideIsComplete
+        ? emptyPlatformLinks()
+        : await fetchPlatformLinks(r.spotifyUrl, r.title);
+      // Layer the override on top: any explicitly-set (non-undefined) field
+      // wins over Odesli's answer. null in an override means "not on this
+      // platform, don't render a button" — explicit hide.
+      if (overrideLinks) {
+        r.platformLinks = {
+          spotify: overrideLinks.spotify !== undefined ? overrideLinks.spotify : fetched.spotify,
+          appleMusic:
+            overrideLinks.appleMusic !== undefined ? overrideLinks.appleMusic : fetched.appleMusic,
+          youtubeMusic:
+            overrideLinks.youtubeMusic !== undefined
+              ? overrideLinks.youtubeMusic
+              : fetched.youtubeMusic,
+          tidal: overrideLinks.tidal !== undefined ? overrideLinks.tidal : fetched.tidal,
+          amazonMusic:
+            overrideLinks.amazonMusic !== undefined
+              ? overrideLinks.amazonMusic
+              : fetched.amazonMusic,
+          deezer: overrideLinks.deezer !== undefined ? overrideLinks.deezer : fetched.deezer,
+          pandora: overrideLinks.pandora !== undefined ? overrideLinks.pandora : fetched.pandora,
+          soundcloud:
+            overrideLinks.soundcloud !== undefined ? overrideLinks.soundcloud : fetched.soundcloud,
+        };
+      } else {
+        r.platformLinks = fetched;
+      }
       const elapsed = Date.now() - before;
       // Only throttle when we actually hit the network. Cache hits return
       // in <5ms — no need to sleep, build stays fast.

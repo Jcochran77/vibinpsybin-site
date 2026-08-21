@@ -1,0 +1,93 @@
+{
+  "https://open.spotify.com/album/1s8KdPMs8lJfTT7MuZlCN9": {
+    "fetchedAt": "2026-07-31T14:15:56.580Z",
+    "links": {
+      "spotify": "https://open.spotify.com/album/1s8KdPMs8lJfTT7MuZlCN9",
+      "appleMusic": null,
+      "youtubeMusic": null,
+      "tidal": "https://listen.tidal.com/album/381385809",
+      "amazonMusic": "https://music.amazon.com/albums/B0DD6Z8ZJX",
+      "deezer": "https://www.deezer.com/album/630155451",
+      "pandora": "https://www.pandora.com/AL:38103471",
+      "soundcloud": null
+    }
+  },
+  "https://open.spotify.com/album/2Cghn84jokHe0B55qrSKqX": {
+    "fetchedAt": "2026-07-31T14:16:03.953Z",
+    "links": {
+      "spotify": "https://open.spotify.com/album/2Cghn84jokHe0B55qrSKqX",
+      "appleMusic": null,
+      "youtubeMusic": null,
+      "tidal": "https://listen.tidal.com/album/261317184",
+      "amazonMusic": null,
+      "deezer": null,
+      "pandora": "https://www.pandora.com/AL:19534156",
+      "soundcloud": null
+    }
+  },
+  "https://open.spotify.com/album/3eFBzYqP9r7u0AvS9g7xFT": {
+    "fetchedAt": "2026-07-31T14:16:11.325Z",
+    "links": {
+      "spotify": "https://open.spotify.com/album/3eFBzYqP9r7u0AvS9g7xFT",
+      "appleMusic": null,
+      "youtubeMusic": null,
+      "tidal": "https://listen.tidal.com/album/217875950",
+      "amazonMusic": "https://music.amazon.com/albums/B09T66Y8LR",
+      "deezer": null,
+      "pandora": null,
+      "soundcloud": null
+    }
+  },
+  "https://open.spotify.com/album/0MLdsz78MRs1E9QOxSrF9Q": {
+    "fetchedAt": "2026-07-31T14:16:18.697Z",
+    "links": {
+      "spotify": "https://open.spotify.com/album/0MLdsz78MRs1E9QOxSrF9Q",
+      "appleMusic": null,
+      "youtubeMusic": null,
+      "tidal": "https://listen.tidal.com/album/209757028",
+      "amazonMusic": null,
+      "deezer": null,
+      "pandora": "https://www.pandora.com/AL:11911452",
+      "soundcloud": null
+    }
+  },
+  "https://open.spotify.com/album/1RqvjuMVJ7537H1rHVSP3Y": {
+    "fetchedAt": "2026-07-31T14:16:26.069Z",
+    "links": {
+      "spotify": "https://open.spotify.com/album/1RqvjuMVJ7537H1rHVSP3Y",
+      "appleMusic": null,
+      "youtubeMusic": null,
+      "tidal": "https://listen.tidal.com/album/206267775",
+      "amazonMusic": null,
+      "deezer": null,
+      "pandora": "https://www.pandora.com/AL:11914223",
+      "soundcloud": null
+    }
+  },
+  "https://open.spotify.com/album/6RZ4gm5OSM1JhpsdeK1QAR": {
+    "fetchedAt": "2026-07-31T14:16:33.543Z",
+    "links": {
+      "spotify": "https://open.spotify.com/album/6RZ4gm5OSM1JhpsdeK1QAR",
+      "appleMusic": null,
+      "youtubeMusic": null,
+      "tidal": "https://listen.tidal.com/album/203622851",
+      "amazonMusic": null,
+      "deezer": null,
+      "pandora": "https://www.pandora.com/AL:11261909",
+      "soundcloud": null
+    }
+  },
+  "https://open.spotify.com/album/0W0m7wwHe5SqugrvuMZJtU": {
+    "fetchedAt": "2026-08-21T18:20:00.000Z",
+    "links": {
+      "spotify": "https://open.spotify.com/album/0W0m7wwHe5SqugrvuMZJtU",
+      "appleMusic": "https://music.apple.com/us/album/reflections/6780425795",
+      "youtubeMusic": null,
+      "tidal": "https://listen.tidal.com/album/533482317",
+      "amazonMusic": null,
+      "deezer": "https://www.deezer.com/album/1005744891",
+      "pandora": null,
+      "soundcloud": null
+    }
+  }
+}

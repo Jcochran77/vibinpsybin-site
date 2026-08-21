@@ -31,8 +31,13 @@ yarn-error.log*
 .dev.vars*
 !.dev.vars.example
 
-# build-time caches (rewritten every run; not source of truth)
-.itunes-cache.json
-.releases-cache.json
-.songlink-cache.json
+# build-time caches (rewritten every run; not source of truth for local dev,
+# but we DO commit .songlink-cache.json so prod builds don't lose
+# platform-link data when Odesli's public API is unavailable (deprecated
+# 2026-08). Same for .itunes-cache.json (Apple Music fallback) and
+# .releases-cache.json (last-known-good release manifest).
+# Uncomment to hide again if we ever move to a fully-live API path.
+#.itunes-cache.json
+#.releases-cache.json
+#.songlink-cache.json
 
