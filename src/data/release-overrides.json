@@ -1,5 +1,14 @@
 {
-  "_comment": "Per-release overrides keyed by Spotify album id. Shape: { '<spotifyAlbumId>': { 'bandcampUrl'?: string } }. Used for releases that ARE on Spotify and need a Bandcamp link attached. Bandcamp-only releases live in manual-releases.json instead.",
+  "_comment": "Per-release overrides keyed by Spotify album id. Shape: { '<spotifyAlbumId>': { 'bandcampUrl'?: string, 'platformLinks'?: { spotify?, appleMusic?, youtubeMusic?, tidal?, amazonMusic?, deezer?, pandora?, soundcloud? } }. Any platformLinks fields set here win over what Odesli returns (or fill gaps when Odesli is down / deprecated). null means 'not on this platform, hide the button'. Bandcamp-only releases live in manual-releases.json instead.",
 
-  "1s8KdPMs8lJfTT7MuZlCN9": { "bandcampUrl": "https://vibinpsybinandthesunlightband.bandcamp.com/album/hippie-cowboy" }
+  "1s8KdPMs8lJfTT7MuZlCN9": { "bandcampUrl": "https://vibinpsybinandthesunlightband.bandcamp.com/album/hippie-cowboy" },
+  "0W0m7wwHe5SqugrvuMZJtU": {
+    "bandcampUrl": "https://vibinpsybinandthesunlightband.bandcamp.com/album/reflections",
+    "platformLinks": {
+      "spotify": "https://open.spotify.com/album/0W0m7wwHe5SqugrvuMZJtU",
+      "appleMusic": "https://music.apple.com/us/album/reflections/6780425795",
+      "tidal": "https://listen.tidal.com/album/533482317",
+      "deezer": "https://www.deezer.com/album/1005744891"
+    }
+  }
 }

@@ -1,0 +1,296 @@
+{
+  "version": 1,
+  "lastUpdated": "2026-08-21T18:18:25.326Z",
+  "artistIds": [
+    "40SRpqCKiQZZ3alrYeXAYR",
+    "16AgfIKYaZe0mmiAHuzVta"
+  ],
+  "releases": [
+    {
+      "id": "0W0m7wwHe5SqugrvuMZJtU",
+      "title": "Reflections",
+      "artist": "Vibin' Psybin and the Sunlight Band",
+      "year": 2026,
+      "type": "album",
+      "coverUrl": "https://i.scdn.co/image/ab67616d0000b273619fcc4da31ce92788688f5b",
+      "spotifyUrl": "https://open.spotify.com/album/0W0m7wwHe5SqugrvuMZJtU",
+      "trackNames": [
+        "To The Wind",
+        "The Ride",
+        "Let Me Loose",
+        "Drugs",
+        "Get Over Get On / Reflections",
+        "Respect The Drip",
+        "Po-Dunk Baby",
+        "Falling In Falling Out",
+        "Sunny Little Café",
+        "The In Between"
+      ],
+      "releaseDate": "2026-07-31",
+      "platformLinks": {
+        "spotify": "https://open.spotify.com/album/0W0m7wwHe5SqugrvuMZJtU",
+        "appleMusic": "https://music.apple.com/us/album/reflections/6780425795",
+        "youtubeMusic": null,
+        "tidal": "https://listen.tidal.com/album/533482317",
+        "amazonMusic": null,
+        "deezer": "https://www.deezer.com/album/1005744891",
+        "pandora": null,
+        "soundcloud": null
+      },
+      "bandcampUrl": "https://vibinpsybinandthesunlightband.bandcamp.com/album/reflections"
+    },
+    {
+      "id": "1s8KdPMs8lJfTT7MuZlCN9",
+      "title": "Hippie Cowboy",
+      "artist": "Vibin' Psybin and the Sunlight Band",
+      "year": 2024,
+      "type": "album",
+      "coverUrl": "https://i.scdn.co/image/ab67616d0000b27377b6a58cd1584411c917e245",
+      "spotifyUrl": "https://open.spotify.com/album/1s8KdPMs8lJfTT7MuZlCN9",
+      "trackNames": [
+        "Do No Wrong",
+        "Good Time Girls",
+        "King of Tennessee",
+        "I Know A Girl",
+        "Because You Said So",
+        "Keep It Kool",
+        "Songbird",
+        "Hippie Cowboy",
+        "It Wasn't Meant To Be"
+      ],
+      "releaseDate": "2024-09-13",
+      "platformLinks": {
+        "spotify": "https://open.spotify.com/album/1s8KdPMs8lJfTT7MuZlCN9",
+        "appleMusic": "https://music.apple.com/us/album/hippie-cowboy/1763105739",
+        "youtubeMusic": null,
+        "tidal": "https://listen.tidal.com/album/381385809",
+        "amazonMusic": "https://music.amazon.com/albums/B0DD6Z8ZJX",
+        "deezer": "https://www.deezer.com/album/630155451",
+        "pandora": "https://www.pandora.com/AL:38103471",
+        "soundcloud": null
+      },
+      "bandcampUrl": "https://vibinpsybinandthesunlightband.bandcamp.com/album/hippie-cowboy"
+    },
+    {
+      "id": "2Cghn84jokHe0B55qrSKqX",
+      "title": "Live Fast",
+      "artist": "Psybin",
+      "year": 2023,
+      "type": "single",
+      "coverUrl": "https://i.scdn.co/image/ab67616d0000b2733892f2e719008e13125b7311",
+      "spotifyUrl": "https://open.spotify.com/album/2Cghn84jokHe0B55qrSKqX",
+      "trackNames": [
+        "A Million Miles",
+        "Love Song #2",
+        "Live Fast",
+        "Headlights (A Brand New Day)",
+        "The Edge",
+        "I Was Wrong"
+      ],
+      "releaseDate": "2023-02-10",
+      "platformLinks": {
+        "spotify": "https://open.spotify.com/album/2Cghn84jokHe0B55qrSKqX",
+        "appleMusic": "https://music.apple.com/us/album/live-fast-ep/1655258621",
+        "youtubeMusic": null,
+        "tidal": "https://listen.tidal.com/album/261317184",
+        "amazonMusic": null,
+        "deezer": null,
+        "pandora": "https://www.pandora.com/AL:19534156",
+        "soundcloud": null
+      },
+      "bandcampUrl": null
+    },
+    {
+      "id": "3eFBzYqP9r7u0AvS9g7xFT",
+      "title": "Tobago",
+      "artist": "Psybin",
+      "year": 2022,
+      "type": "single",
+      "coverUrl": "https://i.scdn.co/image/ab67616d0000b27316538cafd89efa53317923f8",
+      "spotifyUrl": "https://open.spotify.com/album/3eFBzYqP9r7u0AvS9g7xFT",
+      "trackNames": [
+        "Tobago"
+      ],
+      "releaseDate": "2022-03-25",
+      "platformLinks": {
+        "spotify": "https://open.spotify.com/album/3eFBzYqP9r7u0AvS9g7xFT",
+        "appleMusic": null,
+        "youtubeMusic": null,
+        "tidal": "https://listen.tidal.com/album/217875950",
+        "amazonMusic": "https://music.amazon.com/albums/B09T66Y8LR",
+        "deezer": null,
+        "pandora": null,
+        "soundcloud": null
+      },
+      "bandcampUrl": null
+    },
+    {
+      "id": "0MLdsz78MRs1E9QOxSrF9Q",
+      "title": "The Moment",
+      "artist": "Psybin",
+      "year": 2022,
+      "type": "single",
+      "coverUrl": "https://i.scdn.co/image/ab67616d0000b2738d1be4ca3af126289ae1ea7e",
+      "spotifyUrl": "https://open.spotify.com/album/0MLdsz78MRs1E9QOxSrF9Q",
+      "trackNames": [
+        "The Moment"
+      ],
+      "releaseDate": "2022-01-21",
+      "platformLinks": {
+        "spotify": "https://open.spotify.com/album/0MLdsz78MRs1E9QOxSrF9Q",
+        "appleMusic": "https://music.apple.com/us/album/the-moment-single/1601061879",
+        "youtubeMusic": null,
+        "tidal": "https://listen.tidal.com/album/209757028",
+        "amazonMusic": null,
+        "deezer": null,
+        "pandora": "https://www.pandora.com/AL:11911452",
+        "soundcloud": null
+      },
+      "bandcampUrl": null
+    },
+    {
+      "id": "1RqvjuMVJ7537H1rHVSP3Y",
+      "title": "When I'm With You",
+      "artist": "Psybin",
+      "year": 2021,
+      "type": "single",
+      "coverUrl": "https://i.scdn.co/image/ab67616d0000b273135cf70bdfa107180612a4f6",
+      "spotifyUrl": "https://open.spotify.com/album/1RqvjuMVJ7537H1rHVSP3Y",
+      "trackNames": [
+        "When I'm With You"
+      ],
+      "releaseDate": "2021-12-17",
+      "platformLinks": {
+        "spotify": "https://open.spotify.com/album/1RqvjuMVJ7537H1rHVSP3Y",
+        "appleMusic": "https://music.apple.com/us/album/when-im-with-you-single/1596860145",
+        "youtubeMusic": null,
+        "tidal": "https://listen.tidal.com/album/206267775",
+        "amazonMusic": null,
+        "deezer": null,
+        "pandora": "https://www.pandora.com/AL:11914223",
+        "soundcloud": null
+      },
+      "bandcampUrl": null
+    },
+    {
+      "id": "6RZ4gm5OSM1JhpsdeK1QAR",
+      "title": "On the Run",
+      "artist": "Psybin",
+      "year": 2021,
+      "type": "single",
+      "coverUrl": "https://i.scdn.co/image/ab67616d0000b273f61401e6fdd3a4779c3984e8",
+      "spotifyUrl": "https://open.spotify.com/album/6RZ4gm5OSM1JhpsdeK1QAR",
+      "trackNames": [
+        "On the Run"
+      ],
+      "releaseDate": "2021-12-03",
+      "platformLinks": {
+        "spotify": "https://open.spotify.com/album/6RZ4gm5OSM1JhpsdeK1QAR",
+        "appleMusic": "https://music.apple.com/us/album/on-the-run-single/1593326665",
+        "youtubeMusic": null,
+        "tidal": "https://listen.tidal.com/album/203622851",
+        "amazonMusic": null,
+        "deezer": null,
+        "pandora": "https://www.pandora.com/AL:11261909",
+        "soundcloud": null
+      },
+      "bandcampUrl": null
+    },
+    {
+      "id": "3XV9feQckdU5iv8e7mh8bn",
+      "title": "Token",
+      "artist": "Psybin",
+      "year": 2021,
+      "type": "single",
+      "coverUrl": "https://i.scdn.co/image/ab67616d0000b273069f0ab6518cbef190f2ad3e",
+      "spotifyUrl": "https://open.spotify.com/album/3XV9feQckdU5iv8e7mh8bn",
+      "trackNames": [
+        "Token"
+      ],
+      "releaseDate": "2021-10-08",
+      "platformLinks": {
+        "spotify": null,
+        "appleMusic": "https://music.apple.com/us/album/token-single/1587967968",
+        "youtubeMusic": null,
+        "tidal": null,
+        "amazonMusic": null,
+        "deezer": null,
+        "pandora": null,
+        "soundcloud": null
+      },
+      "bandcampUrl": null
+    },
+    {
+      "id": "4xZUVlMI0DbSd4ZbwqovG1",
+      "title": "You Deserve Love",
+      "artist": "Psybin",
+      "year": 2020,
+      "type": "single",
+      "coverUrl": "https://i.scdn.co/image/ab67616d0000b27329daca55c53819ce0a8c7bd4",
+      "spotifyUrl": "https://open.spotify.com/album/4xZUVlMI0DbSd4ZbwqovG1",
+      "trackNames": [
+        "You Deserve Love"
+      ],
+      "releaseDate": "2020-12-04",
+      "platformLinks": {
+        "spotify": null,
+        "appleMusic": "https://music.apple.com/us/album/you-deserve-love-single/1538860899",
+        "youtubeMusic": null,
+        "tidal": null,
+        "amazonMusic": null,
+        "deezer": null,
+        "pandora": null,
+        "soundcloud": null
+      },
+      "bandcampUrl": null
+    },
+    {
+      "id": "5s2wQhb6iOyO7anyhru3jh",
+      "title": "You'll Live",
+      "artist": "Psybin",
+      "year": 2020,
+      "type": "single",
+      "coverUrl": "https://i.scdn.co/image/ab67616d0000b273032231cdabfebea55d1dee4f",
+      "spotifyUrl": "https://open.spotify.com/album/5s2wQhb6iOyO7anyhru3jh",
+      "trackNames": [
+        "You'll Live"
+      ],
+      "releaseDate": "2020-10-23",
+      "platformLinks": {
+        "spotify": null,
+        "appleMusic": "https://music.apple.com/us/album/youll-live-single/1532101903",
+        "youtubeMusic": null,
+        "tidal": null,
+        "amazonMusic": null,
+        "deezer": null,
+        "pandora": null,
+        "soundcloud": null
+      },
+      "bandcampUrl": null
+    },
+    {
+      "id": "4tGWDI3J0OHWSWYprn6MMH",
+      "title": "Deja Vu",
+      "artist": "Psybin",
+      "year": 2020,
+      "type": "single",
+      "coverUrl": "https://i.scdn.co/image/ab67616d0000b273752c7dd293191ad9f836f045",
+      "spotifyUrl": "https://open.spotify.com/album/4tGWDI3J0OHWSWYprn6MMH",
+      "trackNames": [
+        "Deja Vu"
+      ],
+      "releaseDate": "2020-07-21",
+      "platformLinks": {
+        "spotify": null,
+        "appleMusic": "https://music.apple.com/us/album/deja-vu-single/1519525683",
+        "youtubeMusic": null,
+        "tidal": null,
+        "amazonMusic": null,
+        "deezer": null,
+        "pandora": null,
+        "soundcloud": null
+      },
+      "bandcampUrl": null
+    }
+  ]
+}
